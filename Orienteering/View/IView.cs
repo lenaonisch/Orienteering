@@ -19,12 +19,12 @@ namespace Orienteering
         Key GetUserInput();
 
         MapParams MapParameters { get; set; }
-        Game Owner { get; set; }
+        Game CurrentGame { get; set; }
 
         void OnCheckpointTaken(object sender, CellsEventArgs args);
         void OnGameEnded(object sender, ref EndGameEventArgs args);
         void OnHiddenChkpFound(object sender, CellsEventArgs args);
 
-        public event EndGameDelegate EndGame;
+        event EndGameDelegate EndGame;
     }
 }

@@ -45,7 +45,7 @@
             this.gridMap.RowHeadersVisible = false;
             this.gridMap.Size = new System.Drawing.Size(281, 189);
             this.gridMap.TabIndex = 0;
-            this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridMap_KeyDown);
+            this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             // 
             // frmMain
             // 

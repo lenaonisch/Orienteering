@@ -18,7 +18,7 @@ namespace Orienteering
         {
             MapParams mp = new MapParams();
             CreateNewGame(gt, mp);
-            _view.Owner = (Game)_game;
+            _view.CurrentGame = (Game)_game;
             _view.PrintMap(_game.Map);
         }
 
@@ -72,7 +72,7 @@ namespace Orienteering
 
         public void ProcessGameEnding(object sender, ref EndGameEventArgs args)
         {
- 
+            _view.OnGameEnded(sender, ref args);
         }
 
         Game _game = null;

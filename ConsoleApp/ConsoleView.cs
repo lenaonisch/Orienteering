@@ -9,6 +9,9 @@ namespace Orienteering
 {
     public class ConsoleView : IView
     {
+        public static Coord DEFAULT_MAP_OFFSET = new Coord(5, 5);
+
+        #region ctors
         public ConsoleView()
         {
             Console.CursorVisible = false;
@@ -21,10 +24,9 @@ namespace Orienteering
             _canvasOffset = offset;
         }
 
-        public static Coord DEFAULT_MAP_OFFSET = new Coord(5, 5);
+        #endregion
 
-        
-        
+        #region print map, cells...
         private void PrintCell(Cell cell)
         {
             if (cell != null)
@@ -96,6 +98,18 @@ namespace Orienteering
             }
         }
 
+        #endregion
+
+        #region print messages, errors...
+        private void ShowText(string format, params object[] args)
+        {
+            Console.SetCursorPosition(0, 0);
+            PrintBlack(Console.WindowWidth);
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine(format, args);
+            Console.ResetColor();
+        }
+
         public void PrintMessage(string format, params object[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -113,7 +127,74 @@ namespace Orienteering
             Console.ForegroundColor = ConsoleColor.Yellow;
             ShowText(format, args);
         }
+        
+        private void PrintBounds(Coord topLeft, Coord bottomRight)
+        {
+            ConsoleColor cc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.White;
 
+            int x = (int)topLeft.x;
+            int y = (int)topLeft.y;
+            int width = (int)(bottomRight.x - topLeft.x);
+            int height = (int)(bottomRight.y - topLeft.y);
+
+            Console.SetCursorPosition(x, y);
+            Console.Write('\u250C');
+            for (int i = 1; i < width; i++) // upper
+            {
+                Console.Write('\u2500');
+            }
+            Console.SetCursorPosition(x + width, y);
+            Console.Write('\u2510');
+            for (int i = 1; i <= height; i++) // |     |
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.Write('\u2502');
+                Console.SetCursorPosition(x + width, y + i);
+                Console.Write('\u2502');
+            }
+            Console.SetCursorPosition(x, y + height);
+            Console.Write('\u2514');
+            for (int i = 1; i < width; i++) //bottom
+            {
+                Console.Write('\u2500');
+            }
+            Console.SetCursorPosition(x + width, y + height);
+            Console.Write('\u2518');
+
+            Console.ForegroundColor = cc;
+        }
+
+        private void PrintBlack(int len = 1)
+        {
+            char[] cs = new char[len];
+            for (int i = 0; i < len; i++)
+			{
+			    cs[i] = ' ';
+			}
+            ConsoleColor cc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.Write(new string(cs));
+            Console.ForegroundColor = cc;
+        }
+        private void PrintBlack(Coord c)
+        {
+            Console.SetCursorPosition((int)(_canvasOffset.x + c.x), (int)(_canvasOffset.y + c.y));
+            PrintBlack();
+        }
+        private void PrintBlack(uint y, uint x)
+        {
+            Console.SetCursorPosition((int)(_canvasOffset.x + x), (int)(_canvasOffset.y + y));
+            PrintBlack();
+        }
+        public void ShowHint(string hint, params object[] args)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            ShowText(hint, args);
+        }
+        #endregion
+
+        #region interact with user
         public Key GetUserInput()
         {
             System.Threading.Thread.Sleep(20);
@@ -154,14 +235,10 @@ namespace Orienteering
                 return false;
             }
         }
+        #endregion
 
-        public void ShowHint(string hint, params object[] args)
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            ShowText(hint, args);
-        }
-
-        public Game Owner
+        #region fields, properties
+        public Game CurrentGame
         {
             get
             {
@@ -175,14 +252,7 @@ namespace Orienteering
 
         Game _owner = null;
         Coord _canvasOffset;
-
-        private void ShowText(string format, params object[] args)
-        {
-            Console.SetCursorPosition(0, 0);
-            Console.WriteLine(format, args);
-            Console.ResetColor();
-        }
-
+        
         public MapParams MapParameters
         {
             get
@@ -194,15 +264,22 @@ namespace Orienteering
                 
             }
         }
+        #endregion
 
+        #region events, handlers...
         public void OnCheckpointTaken(object sender, CellsEventArgs args)
         {
             ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+            ReprintChangedCells(args._cells);
         }
 
-        public void OnGameEnded(object sender, EndGameEventArgs args)
+        public void OnGameEnded(object sender, ref EndGameEventArgs args)
         {
-            GetYesNoAnswer("Do you want to repeat?");
+            if (args == null)
+            {
+                args = new EndGameEventArgs();
+            }
+            args.Restart = GetYesNoAnswer("Press Y to repeat: ?"); 
         }
 
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
@@ -210,59 +287,18 @@ namespace Orienteering
             throw new NotImplementedException();
         }
 
-        private void PrintBounds(Coord topLeft, Coord bottomRight)
+        EndGameDelegate _endGame;
+        public event EndGameDelegate EndGame
         {
-            ConsoleColor cc = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.White;
-
-            int x = (int)topLeft.x;
-            int y = (int)topLeft.y;
-            int width = (int)(bottomRight.x - topLeft.x);
-            int height = (int)(bottomRight.y - topLeft.y);
-
-            Console.SetCursorPosition(x, y);
-            Console.Write('\u250C');
-            for (int i = 1; i < width; i++) // upper
+            add
             {
-                Console.Write('\u2500');
+                _endGame += value;
             }
-            Console.SetCursorPosition(x + width, y);
-            Console.Write('\u2510');
-            for (int i = 1; i <= height; i++) // |     |
+            remove
             {
-                Console.SetCursorPosition(x, y + i);
-                Console.Write('\u2502');
-                Console.SetCursorPosition(x + width, y + i);
-                Console.Write('\u2502');
+                _endGame -= value;
             }
-            Console.SetCursorPosition(x, y + height);
-            Console.Write('\u2514');
-            for (int i = 1; i < width; i++) //bottom
-            {
-                Console.Write('\u2500');
-            }
-            Console.SetCursorPosition(x + width, y + height);
-            Console.Write('\u2518');
-
-            Console.ForegroundColor = cc;
         }
-
-        private void PrintBlack()
-        {
-            ConsoleColor cc = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.Write(" ");
-            Console.ForegroundColor = cc;
-        }
-        private void PrintBlack(Coord c)
-        {
-            Console.SetCursorPosition((int)(_canvasOffset.x + c.x), (int)(_canvasOffset.y + c.y));
-            PrintBlack();
-        }
-        private void PrintBlack(uint y, uint x)
-        {
-            Console.SetCursorPosition((int)(_canvasOffset.x + x), (int)(_canvasOffset.y + y));
-            PrintBlack();
-        }
+        #endregion
     }
 }

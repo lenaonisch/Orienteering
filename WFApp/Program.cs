@@ -21,7 +21,7 @@ namespace WFApp
             
             frmMain view = new frmMain();
             Game game = new GameOrienteering(view);
-            view.Owner = (Game)game;
+            view.CurrentGame = (Game)game;
             
             Application.Run(view);
         }

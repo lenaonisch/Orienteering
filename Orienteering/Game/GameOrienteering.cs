@@ -39,8 +39,7 @@ namespace Orienteering
                     if (_map.AreAllCheckpointsTaken())
                     {
                         EndGameEventArgs endArgs = new EndGameEventArgs(false);
-                        OnGameEnded(this, out endArgs); // summarize results, write results to history, etc...
-                        _endGame(this, endArgs); // no restart, no interrupt
+                        _endGame(this, ref endArgs); // no restart, no interrupt
                         return true;
                     }
                 }
@@ -70,20 +69,5 @@ namespace Orienteering
             MapParams parameters = new MapParams();
             return InitNew(parameters);
         }
-
-        #region events
-        protected EndGameDelegate _endGame;
-        public event EndGameDelegate EndGame
-        {
-            add
-            {
-                _endGame += value;
-            }
-            remove
-            {
-                _endGame -= value;
-            }
-        }
-        #endregion
     }
 }
