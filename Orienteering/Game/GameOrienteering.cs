@@ -6,51 +6,52 @@ using System.Threading.Tasks;
 
 namespace Orienteering
 {
-    public class GameOrienteering : Game//, IGame
+    public class GameOrienteering : Game
     {
         public GameOrienteering(IView view)
             :base(view)
         {
-            //_view.MakeMove += MakeMove;
         }
 
-        public override void OnEnd(object sender, EndGameEventArgs args)
+        public override void OnGameEnded(object sender, ref EndGameEventArgs args)
         {
-            if (sender != this) // if game was interrupted from outside, outside interrupters should take care theirselves
-            {
-                _endGame = null;
-            }
             _timer.Stop();
+            
         }
 
-        public override bool MakeMove(Offset offset/*object sender, ChangePositionEventArgs args*/)
+        // return true if player changed his position
+        public override bool MakeMove(Offset offset)
         {
-            
             if (_timer == null) // first step
             {
                 _timer = new System.Diagnostics.Stopwatch();
                 _timer.Start();
             }
 
-            bool moved = _player.Move(offset);
+            Coord newCoord;
+            bool moved = _player.CanMove(offset, out newCoord);
             if (moved) // move player if possible
             {
-                
-                if (_map.TakeCheckpoint(_player.Position)) // take checkpoint on new player's position
+                if (_map.TakeCheckpoint(newCoord)) // take checkpoint on new player's position
                 {
-                    _chkpTaken(this, new CheckpointsEventArgs((Checkpoint)_map[_player.Position]));
+                    _chkpTaken(this, new CellsEventArgs((Checkpoint)_map[newCoord]));
+                    _player.Move(newCoord);
                     if (_map.AreAllCheckpointsTaken())
                     {
-                        EndGameEventArgs endArgs = new EndGameEventArgs(false, false);
-                        OnEnd(this, endArgs); // summarize results, write results to history, etc...
+                        EndGameEventArgs endArgs = new EndGameEventArgs(false);
+                        OnGameEnded(this, out endArgs); // summarize results, write results to history, etc...
                         _endGame(this, endArgs); // no restart, no interrupt
                         return true;
                     }
                 }
+                else
+                {
+                    _player.Move(newCoord);
+                }
                 Checkpoint[] surround;
                 if (_map.AreCheckpointsClose(_player.Position, out surround, true, _player.ViewRadius)) // if some checkpoints are close - give possibility for player to know about it
                 {
-                    _chkpSurrondingFound(this, new CheckpointsEventArgs(surround));
+                    _chkpSurrondingFound(this, new CellsEventArgs(surround));
                 }
             }
             return moved;
@@ -58,11 +59,10 @@ namespace Orienteering
 
         public override Game InitNew(MapParams parameters)
         {
-            Game go = new GameOrienteering(_view);
+            _map = Map.CreateRandom(parameters);
+           _player = Map.PlacePlayer(_map);
 
-            _map = (Map)Map.CreateRandom(parameters);
-            _player = new Player(_map);
-            return go;
+            return this;
         }
 
         public override Game InitNew()
@@ -70,5 +70,20 @@ namespace Orienteering
             MapParams parameters = new MapParams();
             return InitNew(parameters);
         }
+
+        #region events
+        protected EndGameDelegate _endGame;
+        public event EndGameDelegate EndGame
+        {
+            add
+            {
+                _endGame += value;
+            }
+            remove
+            {
+                _endGame -= value;
+            }
+        }
+        #endregion
     }
 }

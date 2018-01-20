@@ -9,7 +9,7 @@ namespace Orienteering
 {
     public abstract class Game
     {
-        public abstract void OnEnd(object sender, EndGameEventArgs args);
+        public abstract void OnGameEnded(object sender, ref EndGameEventArgs args);
         public abstract bool MakeMove(Offset offset);
         public abstract Game InitNew(MapParams parameters);
         public abstract Game InitNew();
@@ -25,7 +25,7 @@ namespace Orienteering
             set { _map = value; }
         }
 
-        public Player Player
+        public Person Player
         {
             get { return _player; }
             set { _player = value; }
@@ -56,12 +56,12 @@ namespace Orienteering
         }
 
         protected Map           _map = null;
-        protected Player        _player = null;
+        protected Person        _player = null;
         protected IView         _view = null;
         protected Stopwatch     _timer = null;
 
         #region events
-        public event CheckpointsDelegate CheckpointWasTaken
+        public event CellsAffectedDelegate CheckpointWasTaken
         {
             add
             {
@@ -72,7 +72,7 @@ namespace Orienteering
                 _chkpTaken -= value;
             }
         }
-        public event CheckpointsDelegate FoundSurrondingCheckpoint
+        public event CellsAffectedDelegate FoundSurrondingCheckpoint
         {
             add
             {
@@ -83,20 +83,9 @@ namespace Orienteering
                 _chkpSurrondingFound -= value;
             }
         }
-        public event EndGameDelegate EndGame
-        {
-            add
-            {
-                _endGame += value;
-            }
-            remove
-            {
-                _endGame -= value;
-            }
-        }
-        protected CheckpointsDelegate _chkpTaken;
-        protected CheckpointsDelegate _chkpSurrondingFound;
-        protected EndGameDelegate _endGame;
+        
+        protected CellsAffectedDelegate _chkpTaken;
+        protected CellsAffectedDelegate _chkpSurrondingFound;
         
         public event ChangePositionDelegate PlayerMoved
         {
@@ -111,6 +100,18 @@ namespace Orienteering
         }
 
         public ChangePositionDelegate _move;
+        protected EndGameDelegate _endGame;
+        public event EndGameDelegate EndGame
+        {
+            add
+            {
+                _endGame += value;
+            }
+            remove
+            {
+                _endGame -= value;
+            }
+        }
         #endregion
     }
 }

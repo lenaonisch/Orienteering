@@ -11,15 +11,8 @@ namespace Orienteering
         public const uint DEFAULT_AREA = 10;
 
         #region ---- ctors + Clone -----
-        public Water(Map owner, bool isVisible = true, ObstacleType type = ObstacleType.River, uint area = DEFAULT_AREA)
-            : base(owner, isVisible, type)
-        {
-            coordinates = new Coord[area];
-            _type = type;
-        }
-
         public Water(Map owner, Coord[] area, bool isVisible = true, ObstacleType type = ObstacleType.River)
-            :base(owner)
+            :base(owner, area[0], isVisible, type)
         {
             coordinates = new Coord[area.Length];
             for (uint i = 0; i < area.Length; i++)
@@ -30,7 +23,7 @@ namespace Orienteering
         }
 
         public Water(Water w)
-            : base(w._owner, w._position, w._isVisible)
+            : base(w._owner, w._position, w.Visible)
         {
 
         }
@@ -43,8 +36,8 @@ namespace Orienteering
 
         public static Water CreateRandom(Map map, uint square = DEFAULT_AREA, ObstacleType type = ObstacleType.River)
         {
-            Water newWat = new Water(map, true, ObstacleType.River, square);
-            newWat.coordinates[0] = map.GetRandomEmptyCell();
+            Coord[] coordinates = new Coord[square];
+            coordinates[0] = map.GetRandomEmptyCell();
 
             Direction prevDirection = Direction.NoDirection;
             uint lastfilledindex = 0;
@@ -52,10 +45,12 @@ namespace Orienteering
             {
                 Direction newDirection = Randomizer.NextDirection(prevDirection);
                 uint len = (uint)Randomizer.rand.Next(1, (int)(square - lastfilledindex - 1));
-                lastfilledindex += newWat.CloneCellInLine(type, newDirection, newWat.coordinates[lastfilledindex], len);
+                Coord[] ctemp = CloneCellInLine(newDirection, coordinates[lastfilledindex], len, map.size);
+                Array.Copy(ctemp, 0, coordinates, lastfilledindex, ctemp.Length);
+                lastfilledindex += (uint)ctemp.Length;
                 prevDirection = newDirection;
             }
-            return newWat;
+            return new Water(map, coordinates, true, type);
         }
     }
 }

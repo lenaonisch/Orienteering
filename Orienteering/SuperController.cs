@@ -35,16 +35,20 @@ namespace Orienteering
                 default:
                     break;
             }
-
-            _game.Map = Map.CreateRandom(parameters);
-            _game.Player = Map.PlacePlayer(_game.Map);
+            _game.InitNew(parameters);
         }
 
         // returns true, if new game should be started after this one ended
-        public bool PlayTheGame()
+        public void PlayTheGame()
         {
             Key key;
-           // _game.CheckpointWasTaken += 
+            _game.CheckpointWasTaken += _view.OnCheckpointTaken;
+            _game.FoundSurrondingCheckpoint += _view.OnHiddenChkpFound;
+
+            // SuperController is subscribed on both events from view & game
+            _game.EndGame += ProcessGameEnding;
+            _view.EndGame += ProcessGameEnding;
+            /////
 
             do
             {  
@@ -63,9 +67,17 @@ namespace Orienteering
                 }
             }
             while (key != Key.Escape);
-            return _view.GetYesNoAnswer("Press Y to repeat: ?");
+
         }
+
+        public void ProcessGameEnding(object sender, ref EndGameEventArgs args)
+        {
+ 
+        }
+
         Game _game = null;
-        IView _view;
+        IView _view = null;
+
+        
     }
 }

@@ -23,12 +23,20 @@ namespace Orienteering
 
         public static Coord DEFAULT_MAP_OFFSET = new Coord(5, 5);
 
+        
+        
         private void PrintCell(Cell cell)
         {
             if (cell != null)
-            {
-                Console.SetCursorPosition((int)(_canvasOffset.x + cell.Position.x * 2), (int)(_canvasOffset.y + cell.Position.y));
-                if (cell is Player)
+            {    
+                if (!cell.Visible)
+                {
+                    PrintBlack(cell.Position);
+                    return;
+                }
+
+                Console.SetCursorPosition((int)(_canvasOffset.x + cell.Position.x), (int)(_canvasOffset.y + cell.Position.y));
+                if (cell is Person)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("P");
@@ -63,12 +71,19 @@ namespace Orienteering
 
         public void PrintMap(Map map)
         {
-            Console.Clear();
+            PrintBounds(new Coord(_canvasOffset.y - 1, _canvasOffset.x - 1), new Coord(_canvasOffset.y + map.Height, _canvasOffset.x + map.Width));
             for (uint x = 0; x < map.size.x; x++)
             {
                 for (uint y = 0; y < map.size.y; y++)
                 {
-                    PrintCell(map[y, x]);
+                    if (map[y, x] == null)
+                    {
+                        PrintBlack(y, x);
+                    }
+                    else
+                    {
+                        PrintCell(map[y, x]);
+                    }
                 }
             }
         }
@@ -79,13 +94,6 @@ namespace Orienteering
             {
                 PrintCell(c);
             }
-        }
-
-        private void ShowText(string format, params object[] args)
-        {
-            Console.SetCursorPosition(0, 0);
-            Console.WriteLine(format, args);
-            Console.ResetColor();
         }
 
         public void PrintMessage(string format, params object[] args)
@@ -168,6 +176,13 @@ namespace Orienteering
         Game _owner = null;
         Coord _canvasOffset;
 
+        private void ShowText(string format, params object[] args)
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine(format, args);
+            Console.ResetColor();
+        }
+
         public MapParams MapParameters
         {
             get
@@ -178,6 +193,76 @@ namespace Orienteering
             {
                 
             }
+        }
+
+        public void OnCheckpointTaken(object sender, CellsEventArgs args)
+        {
+            ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+        }
+
+        public void OnGameEnded(object sender, EndGameEventArgs args)
+        {
+            GetYesNoAnswer("Do you want to repeat?");
+        }
+
+        public void OnHiddenChkpFound(object sender, CellsEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PrintBounds(Coord topLeft, Coord bottomRight)
+        {
+            ConsoleColor cc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.White;
+
+            int x = (int)topLeft.x;
+            int y = (int)topLeft.y;
+            int width = (int)(bottomRight.x - topLeft.x);
+            int height = (int)(bottomRight.y - topLeft.y);
+
+            Console.SetCursorPosition(x, y);
+            Console.Write('\u250C');
+            for (int i = 1; i < width; i++) // upper
+            {
+                Console.Write('\u2500');
+            }
+            Console.SetCursorPosition(x + width, y);
+            Console.Write('\u2510');
+            for (int i = 1; i <= height; i++) // |     |
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.Write('\u2502');
+                Console.SetCursorPosition(x + width, y + i);
+                Console.Write('\u2502');
+            }
+            Console.SetCursorPosition(x, y + height);
+            Console.Write('\u2514');
+            for (int i = 1; i < width; i++) //bottom
+            {
+                Console.Write('\u2500');
+            }
+            Console.SetCursorPosition(x + width, y + height);
+            Console.Write('\u2518');
+
+            Console.ForegroundColor = cc;
+        }
+
+        private void PrintBlack()
+        {
+            ConsoleColor cc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.Write(" ");
+            Console.ForegroundColor = cc;
+        }
+        private void PrintBlack(Coord c)
+        {
+            Console.SetCursorPosition((int)(_canvasOffset.x + c.x), (int)(_canvasOffset.y + c.y));
+            PrintBlack();
+        }
+        private void PrintBlack(uint y, uint x)
+        {
+            Console.SetCursorPosition((int)(_canvasOffset.x + x), (int)(_canvasOffset.y + y));
+            PrintBlack();
         }
     }
 }

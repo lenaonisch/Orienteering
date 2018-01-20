@@ -71,7 +71,7 @@ namespace Orienteering
         //    return true;
         //}
 
-        public override void OnEnd(object sender, EndGameEventArgs args)
+        public override void OnGameEnded(object sender, ref EndGameEventArgs args)
         {
             throw new NotImplementedException();
         }

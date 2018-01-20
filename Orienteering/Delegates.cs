@@ -58,23 +58,25 @@ namespace Orienteering
     public class EndGameEventArgs : EventArgs
     {
         public bool Restart { get; set; }
+        public MapParams mapParameters { get; set; }
+        public int Score { get; set; }
         //public bool Aborted { get; set; } // true - if game was finished itself, false - user interrupted it on the middle
-        public EndGameEventArgs(bool restart = true, bool aborted = false)
+        public EndGameEventArgs(bool restart = true)
         {
             Restart = restart;
             //Aborted = aborted;
         }
     }
 
-    public class CheckpointsEventArgs : EventArgs
+    public class CellsEventArgs : EventArgs
     {
-        public Checkpoint[] _checkpoints { get; private set; }
-        public CheckpointsEventArgs(params Checkpoint[] ckps)
+        public Cell[] _cells { get; private set; }
+        public CellsEventArgs(params Cell[] cells)
         {
-            _checkpoints = new Checkpoint[ckps.Length];
-            for (int i = 0; i < ckps.Length; i++)
+            _cells = new Checkpoint[cells.Length];
+            for (int i = 0; i < cells.Length; i++)
             {
-                _checkpoints[i] = ckps[i];
+                _cells[i] = cells[i];
             }
         }
     }
@@ -84,7 +86,7 @@ namespace Orienteering
 
     }
 
-    public delegate void EndGameDelegate(object sender, EndGameEventArgs args);
+    public delegate void EndGameDelegate(object sender, ref EndGameEventArgs args);
     public delegate void ChangePositionDelegate(object sender, ChangePositionEventArgs args);
-    public delegate void CheckpointsDelegate(object sender, CheckpointsEventArgs args);
+    public delegate void CellsAffectedDelegate(object sender, CellsEventArgs args);
 }

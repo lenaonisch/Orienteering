@@ -61,7 +61,7 @@
     <Compile Include="Map\MapContainer.cs" />
     <Compile Include="Cells\ObstacleType.cs" />
     <Compile Include="Cells\Obstacle.cs" />
-    <Compile Include="Cells\Player.cs" />
+    <Compile Include="Cells\Person.cs" />
     <Compile Include="Offset.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

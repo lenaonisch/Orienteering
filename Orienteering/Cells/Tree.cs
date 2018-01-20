@@ -8,18 +8,19 @@ namespace Orienteering
 {
     class Tree : Obstacle
     {
-        public Tree(Map owner)
-            :base(owner)
+        //public Tree(Map owner)
+        //    :base(owner)
+        //{
+        //    _square = 1;
+        //    _type = ObstacleType.Tree;
+        //}
+
+        public Tree(Map owner, Coord coord)
+            : base(owner, coord)
         {
             _square = 1;
             _type = ObstacleType.Tree;
-        }
-
-        public Tree(Map owner, Coord coord)
-            : this(owner)
-        {
             coordinates = new Coord[] {coord};
-            owner[coord] = this;
         }
 
         public Tree(Tree t)

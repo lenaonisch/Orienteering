@@ -258,34 +258,34 @@ namespace Orienteering
             }
         }
 
-        private static void InitRandomRoute(Map map)
-        {
-            // source: https://habrahabr.ru/post/176671/
-            int[,] field = new int[map.size.y, map.size.x];
-            CreateFirstMazeLine(field);
-            for (int line = 1; line < field.GetLength(0) - 3; line += 2)
-            {
-                CreateLowerBound(field, line);
-                Step5a(field, line + 1);
-                CreateRightBounds(field, line + 2);
-            }
-            //CreateLowerBound(field, field.GetLength(0) - 1);
+        //private static void InitRandomRoute(Map map)
+        //{
+        //    // source: https://habrahabr.ru/post/176671/
+        //    int[,] field = new int[map.size.y, map.size.x];
+        //    CreateFirstMazeLine(field);
+        //    for (int line = 1; line < field.GetLength(0) - 3; line += 2)
+        //    {
+        //        CreateLowerBound(field, line);
+        //        Step5a(field, line + 1);
+        //        CreateRightBounds(field, line + 2);
+        //    }
+        //    //CreateLowerBound(field, field.GetLength(0) - 1);
 
-            for (int i = 0; i < field.GetLength(0); i++)
-            {
-                for (int j = 0; j < field.GetLength(1); j++)
-                {
-                    if (field[i, j] != -1)
-                    {
-                        map.Field[i, j] = null;
-                    }
-                    else
-                    {
-                        map.Field[i, j] = new Obstacle(map); //new Cell(map, MapCellType.Obstacle);
-                    }
-                }
-            }
-        }
+        //    for (int i = 0; i < field.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < field.GetLength(1); j++)
+        //        {
+        //            if (field[i, j] != -1)
+        //            {
+        //                map.Field[i, j] = null;
+        //            }
+        //            else
+        //            {
+        //                map.Field[i, j] = new Obstacle(map); //new Cell(map, MapCellType.Obstacle);
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
 
@@ -337,9 +337,9 @@ namespace Orienteering
             }
         }
 
-        public static Player PlacePlayer(Map map)
+        public static Person PlacePlayer(Map map)
         {
-            Player p = new Player(map, map.GetRandomEmptyCell());
+            Person p = new Person(map, map.GetRandomEmptyCell());
             map[p.Position] = p;
             return p;
         }

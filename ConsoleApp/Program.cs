@@ -12,14 +12,15 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            ConsoleView view = new ConsoleView();
+            ConsoleView view = new ConsoleView(ConsoleView.DEFAULT_MAP_OFFSET);
             SuperController sc = new SuperController(view);
             
             do
             {
                 sc.CreateNewGame(GameType.Orienteering);
+                sc.PlayTheGame();
             }
-            while (sc.PlayTheGame());
+            while (true);
             Console.ReadLine();
         }
     }

@@ -6,32 +6,25 @@ using System.Threading.Tasks;
 
 namespace Orienteering
 {
-    public class Player : Cell
+    public class Person : Cell
     {
-        public const uint DEFAULT_VIEW_RADIUS = 1;
+        public const uint DEFAULT_VIEW_RADIUS = 5;
 
         #region ctors + Clone
-        public Player(Map owner, uint viewRadius = DEFAULT_VIEW_RADIUS)
-            : base (owner, true)
+
+        public Person(Map owner, Coord position, uint viewRadius = DEFAULT_VIEW_RADIUS)
+            : base(owner, position, true)
         {
-            _position = owner.GetRandomEmptyCell();
             ViewRadius = viewRadius;
         }
 
-        public Player(Map owner, Coord position)
-            : base(owner, true)
-        {
-            _position.x = position.x;
-            _position.y = position.y;
-        }
-
-        public Player(Player p)
+        public Person(Person p)
             : this(p._owner, p._position)
         { }
 
         public override Cell Clone()
         {
-            return new Player(this);
+            return new Person(this);
         }
         #endregion
 
@@ -60,15 +53,11 @@ namespace Orienteering
             return ret;
         }
 
-        public bool Move(Offset offset)
+        public void Move(Coord newCoord)
         {
-            Coord newCoord;
-            if (CanMove(offset, out newCoord))
-            {
-                _position = newCoord;
-                return true;
-            }
-            return false;
+            _owner[Position] = null;
+            _position = newCoord;
+            _owner[Position] = this;
         }
         #endregion
 

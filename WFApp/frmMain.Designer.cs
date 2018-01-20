@@ -28,46 +28,42 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblHint = new System.Windows.Forms.Label();
-            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.gridMap = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).BeginInit();
             this.SuspendLayout();
             // 
-            // lblHint
+            // gridMap
             // 
-            this.lblHint.AutoSize = true;
-            this.lblHint.Location = new System.Drawing.Point(12, 240);
-            this.lblHint.Name = "lblHint";
-            this.lblHint.Size = new System.Drawing.Size(0, 13);
-            this.lblHint.TabIndex = 0;
-            // 
-            // elementHost1
-            // 
-            this.elementHost1.Location = new System.Drawing.Point(0, 0);
-            this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(284, 222);
-            this.elementHost1.TabIndex = 1;
-            this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = null;
+            this.gridMap.AllowUserToAddRows = false;
+            this.gridMap.AllowUserToDeleteRows = false;
+            this.gridMap.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.gridMap.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridMap.ColumnHeadersVisible = false;
+            this.gridMap.Location = new System.Drawing.Point(1, 2);
+            this.gridMap.Name = "gridMap";
+            this.gridMap.ReadOnly = true;
+            this.gridMap.RowHeadersVisible = false;
+            this.gridMap.Size = new System.Drawing.Size(281, 189);
+            this.gridMap.TabIndex = 0;
+            this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridMap_KeyDown);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.elementHost1);
-            this.Controls.Add(this.lblHint);
+            this.Controls.Add(this.gridMap);
             this.Name = "frmMain";
             this.Text = "Main";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
+            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label lblHint;
-        private System.Windows.Forms.Integration.ElementHost elementHost1;
+        private System.Windows.Forms.DataGridView gridMap;
 
     }
 }

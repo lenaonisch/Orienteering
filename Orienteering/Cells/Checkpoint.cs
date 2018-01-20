@@ -11,29 +11,15 @@ namespace Orienteering
         public const byte DEFAULT_PRICE = 1;
 
         #region ---- ctors + Clone -----
-        public Checkpoint(Map owner, bool isVisible = true)
-            :base(owner, isVisible)
-        {
-            _isVisible = isVisible;
-        }
-
-        public Checkpoint(Map owner, Coord position)
-            : this(owner)
-        {
-            _position.x = position.x;
-            _position.y = position.y;
-        }
-
         public Checkpoint(Map owner, Coord position, bool isVisible = true, byte price = DEFAULT_PRICE, bool taken = false)
-            :this(owner, position)
-        {
+            :base(owner, position, isVisible)
+        {           
             _price = price;
             _taken = taken;
-            _isVisible = isVisible;
         }
 
         public Checkpoint(Checkpoint c)
-            :this(c._owner, c._position, c._isVisible, c._price, c._taken)
+            :this(c._owner, c._position, c.Visible, c._price, c._taken)
         {
             
         }
@@ -43,6 +29,11 @@ namespace Orienteering
             return new Checkpoint(this);
         }
         #endregion
+
+        public override string ToString()
+        {
+            return String.Format("({0}, {1}) with price {2}", _position.y, _position.x, _price);
+        }
 
         public bool Taken
         {

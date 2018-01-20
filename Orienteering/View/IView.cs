@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Orienteering
 {
@@ -15,10 +16,15 @@ namespace Orienteering
         void PrintWarning(string format, params object[] args);
         bool GetYesNoAnswer(string format, params object[] args);
         void ShowHint(string hint, params object[] args);
+        Key GetUserInput();
+
         MapParams MapParameters { get; set; }
         Game Owner { get; set; }
-        System.Windows.Input.Key GetUserInput();
 
-        //event ChangePositionDelegate MakeMove;
+        void OnCheckpointTaken(object sender, CellsEventArgs args);
+        void OnGameEnded(object sender, ref EndGameEventArgs args);
+        void OnHiddenChkpFound(object sender, CellsEventArgs args);
+
+        public event EndGameDelegate EndGame;
     }
 }

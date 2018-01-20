@@ -9,22 +9,21 @@ namespace Orienteering
     public class Obstacle : Cell
     {
         #region ---- ctors + Clone -----
-        public Obstacle(Map owner, bool isVisible = true, ObstacleType type = ObstacleType.River)
-            :base(owner, isVisible)
+        //public Obstacle(Map owner, bool isVisible = true, ObstacleType type = ObstacleType.River)
+        //    :base(owner, isVisible)
+        //{
+        //    Visible = isVisible;
+        //    _type = type;
+        //}
+
+        public Obstacle(Map owner, Coord position, bool isVisible = true, ObstacleType type = ObstacleType.River)
+            : base(owner, position, isVisible)
         {
-            _isVisible = isVisible;
             _type = type;
         }
 
-        public Obstacle(Map owner, Coord position, bool isVisible = true, ObstacleType type = ObstacleType.River)
-            : this(owner, isVisible)
-        {
-            _position.x = position.x;
-            _position.y = position.y;
-        }
-
         public Obstacle(Obstacle c)
-            :this(c._owner, c._position, c._isVisible)
+            :this(c._owner, c._position, c.Visible)
         {
             
         }
@@ -68,16 +67,15 @@ namespace Orienteering
             return obstacle;
         }
 
-        protected uint CloneCellInLine(ObstacleType type, Direction direction, Coord curCoord, uint len)
+        protected static Coord[] CloneCellInLine(Direction direction, Coord curCoord, uint len, Coord maxSize)
         {
             Coord[] coordinates = new Coord[len];
-            Coord size = _owner.size;
             Offset offset = Offset.Get(direction);
             for (uint i = 0; i < len; i++)
             {
                 int tmpx = (int)curCoord.x + offset.x;
                 int tmpy = (int)curCoord.y + offset.y;
-                if (tmpx < size.x && tmpx >= 0 && tmpy < size.y && tmpy >= 0)
+                if (tmpx < maxSize.x && tmpx >= 0 && tmpy < maxSize.y && tmpy >= 0)
                 {
                     curCoord.x = (uint)tmpx;
                     curCoord.y = (uint)tmpy;
@@ -89,21 +87,7 @@ namespace Orienteering
                     break;
                 }
             }
-
-            switch (type)
-            {
-                case ObstacleType.River:
-                case ObstacleType.Swamp:
-                    new Water(_owner, coordinates, true, type);
-                    break;
-                case ObstacleType.Tree:
-                    foreach (Coord c in coordinates)
-                    {
-                        new Tree(_owner, c);
-                    }
-                    break;
-            }
-            return (uint)coordinates.Length;
+            return coordinates;
         }
 
 //        protected void PlaceLine(MapContainer map, Direction direction, MapCellType type, uint len)

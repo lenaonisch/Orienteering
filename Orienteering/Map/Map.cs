@@ -78,6 +78,7 @@ namespace Orienteering
             {
                 _takenCheckpoints++;
                 chkp.Taken = true;
+                chkp.Visible = false;
                 ret = true;
             }
             return ret;
