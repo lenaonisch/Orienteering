@@ -57,15 +57,11 @@ namespace Orienteering
 
     public class EndGameEventArgs : EventArgs
     {
-        public bool Restart { get; set; }
-        public MapParams mapParameters { get; set; }
+        public bool StartNew { get; set; }
+        public MapParams MapParameters { get; set; }
+        public GameType NewGameType { get; set; }
         public int Score { get; set; }
         //public bool Aborted { get; set; } // true - if game was finished itself, false - user interrupted it on the middle
-        public EndGameEventArgs(bool restart = true)
-        {
-            Restart = restart;
-            //Aborted = aborted;
-        }
     }
 
     public class CellsEventArgs : EventArgs

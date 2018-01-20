@@ -193,5 +193,16 @@ namespace WFApp
         }
 
         public event EndGameDelegate EndGame;
+
+
+        public GameType GetNewGameType()
+        {
+            throw new NotImplementedException();
+        }
+
+        public MapParams GetMapParameters()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

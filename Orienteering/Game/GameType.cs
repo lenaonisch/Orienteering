@@ -8,6 +8,7 @@ namespace Orienteering
 {
     public enum GameType
     {
+        None,
         Maze,
         Orienteering
     }

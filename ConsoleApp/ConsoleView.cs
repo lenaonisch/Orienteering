@@ -198,7 +198,7 @@ namespace Orienteering
         public Key GetUserInput()
         {
             System.Threading.Thread.Sleep(20);
-            Key kRet = Key.A;
+            Key kRet = Key.None;
             ConsoleKeyInfo keyInfo = Console.ReadKey(false);
             switch (keyInfo.Key)
             {
@@ -215,7 +215,12 @@ namespace Orienteering
                     kRet = Key.Right;
                     break;
                 case ConsoleKey.Escape:
+                    EndGameEventArgs arg = new EndGameEventArgs();
+                    _endGame(this, ref arg);
                     kRet = Key.Escape;
+                    break;
+                default:
+                    Enum.TryParse(keyInfo.Key.ToString(), out kRet);
                     break;
             }
 
@@ -235,6 +240,41 @@ namespace Orienteering
                 return false;
             }
         }
+
+        public GameType GetNewGameType()
+        {
+            GameType gt = GameType.None;
+            bool error = false;
+            do
+            {
+                PrintMessage("Select game type: m - simple maze, o - orienteering, Esc - exit program");
+                switch (GetUserInput())
+                {
+                    case Key.M:
+                        gt = GameType.Maze;
+                        break;
+                    case Key.O:
+                        gt = GameType.Orienteering;
+                        break;
+                    case Key.Escape:
+                        EndGameEventArgs arg = new EndGameEventArgs();
+                        _endGame(this, ref arg);
+                        break;
+                    default:
+                        PrintError("Invalid input! Try once more: m - simple maze, o - orienteering, Esc - exit program");
+                        error = true;
+                        break;
+                }
+            }
+            while (error);
+            return gt;
+        }
+
+        // dummy
+        public MapParams GetMapParameters()
+        {
+            return new MapParams();
+        }
         #endregion
 
         #region fields, properties
@@ -253,17 +293,6 @@ namespace Orienteering
         Game _owner = null;
         Coord _canvasOffset;
         
-        public MapParams MapParameters
-        {
-            get
-            {
-                return new MapParams();
-            }
-            set
-            {
-                
-            }
-        }
         #endregion
 
         #region events, handlers...
@@ -275,11 +304,24 @@ namespace Orienteering
 
         public void OnGameEnded(object sender, ref EndGameEventArgs args)
         {
+            bool restart = true;
+            if (sender == this)
+            {
+                if (GetYesNoAnswer("Do you really want to exit? Y/N"))
+                {
+                    restart = false;
+                }
+            }
+            else
+            {
+                restart = GetYesNoAnswer("Press Y to repeat: ?");
+            }
+
             if (args == null)
             {
                 args = new EndGameEventArgs();
             }
-            args.Restart = GetYesNoAnswer("Press Y to repeat: ?"); 
+            args.StartNew = restart;
         }
 
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
@@ -300,5 +342,6 @@ namespace Orienteering
             }
         }
         #endregion
+
     }
 }

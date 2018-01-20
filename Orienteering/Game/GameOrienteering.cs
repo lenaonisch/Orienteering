@@ -8,8 +8,8 @@ namespace Orienteering
 {
     public class GameOrienteering : Game
     {
-        public GameOrienteering(IView view)
-            :base(view)
+        public GameOrienteering(/*IView view*/)
+           // :base(view)
         {
         }
 
@@ -38,7 +38,8 @@ namespace Orienteering
                     _player.Move(newCoord);
                     if (_map.AreAllCheckpointsTaken())
                     {
-                        EndGameEventArgs endArgs = new EndGameEventArgs(false);
+                        EndGameEventArgs endArgs = new EndGameEventArgs();
+                        endArgs.Score = this.Score;
                         _endGame(this, ref endArgs); // no restart, no interrupt
                         return true;
                     }

@@ -14,14 +14,16 @@ namespace ConsoleApp
         {
             ConsoleView view = new ConsoleView(ConsoleView.DEFAULT_MAP_OFFSET);
             SuperController sc = new SuperController(view);
-            
+            EndGameEventArgs tmp = new EndGameEventArgs() {StartNew = true}; 
             do
             {
-                sc.CreateNewGame(GameType.Orienteering);
-                sc.PlayTheGame();
+                
+                sc.ProcessNewRound(null, ref tmp); 
+                //sc.CreateNewGame();
+                //sc.PlayTheGame();
             }
-            while (true);
-            Console.ReadLine();
+            while (sc.Active /*view.CurrentGame != null*/);
+            //Console.ReadLine();
         }
     }
 }

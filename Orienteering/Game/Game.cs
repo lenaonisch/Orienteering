@@ -14,9 +14,10 @@ namespace Orienteering
         public abstract Game InitNew(MapParams parameters);
         public abstract Game InitNew();
 
-        public Game(IView view)
+        public Game(/*IView view*/)
         {
-            _view = view;
+            //IsActive = true;
+            //_view = view;
         }
 
         public Map Map
@@ -57,7 +58,7 @@ namespace Orienteering
 
         protected Map           _map = null;
         protected Person        _player = null;
-        protected IView         _view = null;
+       // protected IView         _view = null;
         protected Stopwatch     _timer = null;
 
         #region events

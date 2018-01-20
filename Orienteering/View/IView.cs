@@ -16,9 +16,11 @@ namespace Orienteering
         void PrintWarning(string format, params object[] args);
         bool GetYesNoAnswer(string format, params object[] args);
         void ShowHint(string hint, params object[] args);
+        
         Key GetUserInput();
+        GameType GetNewGameType();
+        MapParams GetMapParameters();
 
-        MapParams MapParameters { get; set; }
         Game CurrentGame { get; set; }
 
         void OnCheckpointTaken(object sender, CellsEventArgs args);

@@ -12,30 +12,31 @@ namespace Orienteering
         public SuperController(IView view)
         {
             _view = view;
+            Active = false;
         }
 
-        public void CreateNewGame(GameType gt)
+        public void CreateNewGame()
         {
-            MapParams mp = new MapParams();
-            CreateNewGame(gt, mp);
-            _view.CurrentGame = (Game)_game;
-            _view.PrintMap(_game.Map);
+            CreateNewGame(_view.GetNewGameType(), _view.GetMapParameters());
         }
 
-        public void CreateNewGame(GameType gt, MapParams parameters)
+        private void CreateNewGame(GameType gt, MapParams parameters)
         {
             switch (gt)
             {
                 case GameType.Maze:
-                    _game = new GameMaze(_view);
+                    _game = new GameMaze(/*_view*/);
                     break;
                 case GameType.Orienteering:
-                    _game = new GameOrienteering(_view);
+                    _game = new GameOrienteering(/*_view*/);
                     break;
                 default:
                     break;
             }
             _game.InitNew(parameters);
+            _view.CurrentGame = _game;
+            _view.PrintMap(_game.Map);
+            Active = true;
         }
 
         // returns true, if new game should be started after this one ended
@@ -46,8 +47,8 @@ namespace Orienteering
             _game.FoundSurrondingCheckpoint += _view.OnHiddenChkpFound;
 
             // SuperController is subscribed on both events from view & game
-            _game.EndGame += ProcessGameEnding;
-            _view.EndGame += ProcessGameEnding;
+            _game.EndGame += ProcessNewRound;
+            _view.EndGame += ProcessNewRound;
             /////
 
             do
@@ -63,21 +64,33 @@ namespace Orienteering
                         {
                             _view.PrintMap(_game.Map);
                         }
-                        break;
+                       break;
                 }
             }
-            while (key != Key.Escape);
-
+            while (Active);
         }
 
-        public void ProcessGameEnding(object sender, ref EndGameEventArgs args)
+        public void ProcessNewRound(object sender, ref EndGameEventArgs args)
         {
-            _view.OnGameEnded(sender, ref args);
+            if (sender != null)
+            {
+                _view.OnGameEnded(sender, ref args);
+            }
+            if (args != null && args.StartNew)
+            {
+                CreateNewGame();
+                PlayTheGame();
+            }
+            else  
+            {
+                Active = false;
+                //_game = null;             //// ????
+                //_view.CurrentGame = null; //// ????
+            }
         }
 
         Game _game = null;
         IView _view = null;
-
-        
+        public bool Active { get; set; }
     }
 }
