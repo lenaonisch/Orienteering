@@ -12,6 +12,8 @@ namespace Orienteering
         public SuperController(IView view)
         {
             _view = view;
+            _view.EndGame += ProcessNewRound;
+            
             Active = false;
         }
 
@@ -49,10 +51,7 @@ namespace Orienteering
 
             // SuperController is subscribed on both events from view & game
             _game.EndGame += ProcessNewRound;
-            _view.EndGame += ProcessNewRound;
-            /////
             _view.MoveInitiated += _game.MakeMove;
-            
             do
             {  
                 _view.GetUserInput();
