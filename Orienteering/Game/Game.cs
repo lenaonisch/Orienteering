@@ -9,8 +9,12 @@ namespace Orienteering
 {
     public abstract class Game
     {
-        public abstract void OnGameEnded(object sender, ref EndGameEventArgs args);
-        public abstract bool MakeMove(Offset offset);
+        public virtual void OnGameEnded(object sender, ref GameControlEventArgs args)
+        {
+            _timer.Stop();
+            args.SecondsPassed = _timer.ElapsedMilliseconds / 1000;
+        }
+        public abstract void MakeMove(object sender, ChangePositionEventArgs args);
         public abstract Game InitNew(MapParams parameters);
         public abstract Game InitNew();
 
@@ -32,14 +36,6 @@ namespace Orienteering
             set { _player = value; }
         }
 
-        public long ElapsedTime 
-        {
-            get
-            {
-                return _timer.ElapsedMilliseconds;
-            }
-        }
-
         public virtual int Score
         {
             get
@@ -58,7 +54,6 @@ namespace Orienteering
 
         protected Map           _map = null;
         protected Person        _player = null;
-       // protected IView         _view = null;
         protected Stopwatch     _timer = null;
 
         #region events
@@ -88,19 +83,19 @@ namespace Orienteering
         protected CellsAffectedDelegate _chkpTaken;
         protected CellsAffectedDelegate _chkpSurrondingFound;
         
-        public event ChangePositionDelegate PlayerMoved
-        {
-            add
-            {
-                _move += value;
-            }
-            remove
-            {
-                _move -= value;
-            }
-        }
+        //public event ChangePositionDelegate PlayerMoved
+        //{
+        //    add
+        //    {
+        //        _move += value;
+        //    }
+        //    remove
+        //    {
+        //        _move -= value;
+        //    }
+        //}
 
-        public ChangePositionDelegate _move;
+        //public ChangePositionDelegate _move;
         protected EndGameDelegate _endGame;
         public event EndGameDelegate EndGame
         {

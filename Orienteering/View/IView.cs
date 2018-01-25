@@ -17,16 +17,18 @@ namespace Orienteering
         bool GetYesNoAnswer(string format, params object[] args);
         void ShowHint(string hint, params object[] args);
         
-        Key GetUserInput();
+        void GetUserInput();
         GameType GetNewGameType();
         MapParams GetMapParameters();
 
         Game CurrentGame { get; set; }
 
         void OnCheckpointTaken(object sender, CellsEventArgs args);
-        void OnGameEnded(object sender, ref EndGameEventArgs args);
+        void OnGameEnded(object sender, ref GameControlEventArgs args);
         void OnHiddenChkpFound(object sender, CellsEventArgs args);
+        void OnPersonMoved(object sender, ChangePositionEventArgs args);
 
         event EndGameDelegate EndGame;
+        event ChangePositionDelegate MoveInitiated;
     }
 }

@@ -9,13 +9,15 @@ namespace Orienteering
     public class Checkpoint : Cell
     {
         public const byte DEFAULT_PRICE = 1;
+        public const byte DEFAULT_SEEN_RADIUS = 3;
 
         #region ---- ctors + Clone -----
-        public Checkpoint(Map owner, Coord position, bool isVisible = true, byte price = DEFAULT_PRICE, bool taken = false)
+        public Checkpoint(Map owner, Coord position, bool isVisible = true, byte price = DEFAULT_PRICE, bool taken = false, byte seenRad = DEFAULT_SEEN_RADIUS)
             :base(owner, position, isVisible)
         {           
             _price = price;
             _taken = taken;
+            SeenRadius = seenRad;
         }
 
         public Checkpoint(Checkpoint c)
@@ -32,7 +34,7 @@ namespace Orienteering
 
         public override string ToString()
         {
-            return String.Format("({0}, {1}) with price {2}", _position.y, _position.x, _price);
+            return String.Format("({0}, {1}), price {2}", _position.y, _position.x, _price);
         }
 
         public bool Taken
@@ -44,8 +46,14 @@ namespace Orienteering
         {
             get { return _price; }
         }
+        public byte SeenRadius
+        {
+            get;
+            set;
+        }
 
         private bool _taken;
         private byte _price;
+        
     }
 }

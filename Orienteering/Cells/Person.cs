@@ -16,6 +16,7 @@ namespace Orienteering
             : base(owner, position, true)
         {
             ViewRadius = viewRadius;
+            owner[position] = this;
         }
 
         public Person(Person p)
@@ -30,36 +31,52 @@ namespace Orienteering
 
         #region methods
 
-        public bool CanMove(Offset offset, out Coord newCoord)
+        public bool CanMove(Offset offset, ref Coord newCoord)
         {
             int newx = (int)_position.x + offset.x;
             int newy = (int)_position.y + offset.y;
-            return CanMove(newy, newx, out newCoord);
+            return CanMove(newy, newx, ref newCoord);
         }
 
-        public bool CanMove(int newy, int newx, out Coord newCoord)
+        public bool CanMove(int newy, int newx, ref Coord newCoord)
         {
             bool ret = false;
 
-            if (Validate(newy, newx) && !(_owner[(uint)newy, (uint)newx] is Obstacle))
+            if (Validate(newy, newx))
             {
-                ret = true;
-                newCoord = new Coord((uint)newy, (uint)newx);
-            }
-            else
-            {
-                newCoord = _position;
+                if (!(_owner[(uint)newy, (uint)newx] is Obstacle))
+                {
+                    ret = true;
+                    newCoord = new Coord((uint)newy, (uint)newx);
+                }
+            
             }
             return ret;
         }
 
         public void Move(Coord newCoord)
         {
+            Coord old = Position;
             _owner[Position] = null;
             _position = newCoord;
             _owner[Position] = this;
+            _move(this, new ChangePositionEventArgs(old, this));
         }
         #endregion
+
+        public event ChangePositionDelegate PlayerMoved
+        {
+            add
+            {
+                _move += value;
+            }
+            remove
+            {
+                _move -= value;
+            }
+        }
+
+        public ChangePositionDelegate _move;
 
         #region properties
 

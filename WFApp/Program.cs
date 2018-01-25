@@ -20,10 +20,15 @@ namespace WFApp
 
             
             frmMain view = new frmMain();
-            Game game = new GameOrienteering(/*view*/);
-            view.CurrentGame = (Game)game;
+
             
+
+            
+            
+            SuperController sc = new SuperController(view);
+
             Application.Run(view);
+
         }
     }
 }

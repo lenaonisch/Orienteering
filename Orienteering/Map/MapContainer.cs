@@ -15,6 +15,7 @@ namespace Orienteering
         public Checkpoint[] Checkpoints; // just references on cells!
         public Cell[,] Field;
         
+
         public Coord size { get; private set; }
 
         public uint Height

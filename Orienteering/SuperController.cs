@@ -25,10 +25,10 @@ namespace Orienteering
             switch (gt)
             {
                 case GameType.Maze:
-                    _game = new GameMaze(/*_view*/);
+                    _game = new GameMaze();
                     break;
                 case GameType.Orienteering:
-                    _game = new GameOrienteering(/*_view*/);
+                    _game = new GameOrienteering();
                     break;
                 default:
                     break;
@@ -42,35 +42,25 @@ namespace Orienteering
         // returns true, if new game should be started after this one ended
         public void PlayTheGame()
         {
-            Key key;
             _game.CheckpointWasTaken += _view.OnCheckpointTaken;
             _game.FoundSurrondingCheckpoint += _view.OnHiddenChkpFound;
+            _game.Player.PlayerMoved += _view.OnPersonMoved;
+
 
             // SuperController is subscribed on both events from view & game
             _game.EndGame += ProcessNewRound;
             _view.EndGame += ProcessNewRound;
             /////
-
+            _view.MoveInitiated += _game.MakeMove;
+            
             do
             {  
-                key = _view.GetUserInput();
-                switch (key)
-                {
-                    case Key.Up:
-                    case Key.Down:
-                    case Key.Left:
-                    case Key.Right:
-                        if (_game.MakeMove(Offset.Get(key)))
-                        {
-                            _view.PrintMap(_game.Map);
-                        }
-                       break;
-                }
+                _view.GetUserInput();
             }
             while (Active);
         }
 
-        public void ProcessNewRound(object sender, ref EndGameEventArgs args)
+        public void ProcessNewRound(object sender, ref GameControlEventArgs args)
         {
             if (sender != null)
             {
@@ -78,14 +68,18 @@ namespace Orienteering
             }
             if (args != null && args.StartNew)
             {
+                if (_game != null)
+                {
+                    ////??????????
+                    _view.MoveInitiated -= _game.MakeMove; 
+                    _game.Player.PlayerMoved -= _view.OnPersonMoved;
+                }
                 CreateNewGame();
                 PlayTheGame();
             }
             else  
             {
                 Active = false;
-                //_game = null;             //// ????
-                //_view.CurrentGame = null; //// ????
             }
         }
 

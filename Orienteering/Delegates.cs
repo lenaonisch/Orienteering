@@ -9,8 +9,8 @@ namespace Orienteering
 {
     public class ChangePositionEventArgs : EventArgs
     {
-        public Key control { get; set; }
-        public Offset offset
+        public Key Control { get; set; }
+        public Offset Offset
         {
             get
             {
@@ -18,8 +18,8 @@ namespace Orienteering
             }
             
         }
-        public Coord newCoord { get; set; }
-        public Cell newCell { get; set; }
+        public Coord OldCoord { get; set; }
+        public Cell NewCell { get; set; }
 
         Offset _offset;
 
@@ -32,44 +32,42 @@ namespace Orienteering
         {
             _offset = offset;
         }
-        public ChangePositionEventArgs(Offset offset, Coord newCoord)
-            : this(offset)
+        public ChangePositionEventArgs(Coord oldCoord, Cell newCell)
         {
-            this.newCoord = newCoord;
-        }
-
-        public ChangePositionEventArgs(Offset offset, Coord newCoord, Cell newCell)
-            : this(offset, newCoord)
-        {
-            this.newCell = newCell;
+            this.NewCell = newCell;
+            this.OldCoord = oldCoord;
         }
         public ChangePositionEventArgs(Key key)
         {
             Key tmp;
             if (Enum.TryParse(key.ToString(), out tmp))
             {
-                control = tmp;
-                _offset = Offset.Get(control);
+                Control = tmp;
+                _offset = Offset.Get(Control);
             }
         }
         #endregion
     }
 
-    public class EndGameEventArgs : EventArgs
+    public class GameControlEventArgs : EventArgs
     {
         public bool StartNew { get; set; }
         public MapParams MapParameters { get; set; }
         public GameType NewGameType { get; set; }
         public int Score { get; set; }
+        public long SecondsPassed { get; set; }
         //public bool Aborted { get; set; } // true - if game was finished itself, false - user interrupted it on the middle
     }
 
     public class CellsEventArgs : EventArgs
     {
         public Cell[] _cells { get; private set; }
+        public uint[] _len { get; set; }
+        public Direction[] _direct { get; set; }
         public CellsEventArgs(params Cell[] cells)
         {
-            _cells = new Checkpoint[cells.Length];
+            _cells = new Cell[cells.Length];
+            
             for (int i = 0; i < cells.Length; i++)
             {
                 _cells[i] = cells[i];
@@ -77,12 +75,7 @@ namespace Orienteering
         }
     }
 
-    public class PlayerMovedEventArgs : EventArgs
-    {
-
-    }
-
-    public delegate void EndGameDelegate(object sender, ref EndGameEventArgs args);
+    public delegate void EndGameDelegate(object sender, ref GameControlEventArgs args);
     public delegate void ChangePositionDelegate(object sender, ChangePositionEventArgs args);
     public delegate void CellsAffectedDelegate(object sender, CellsEventArgs args);
 }

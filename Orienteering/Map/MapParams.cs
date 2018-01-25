@@ -8,10 +8,10 @@ namespace Orienteering
 {
     public class MapParams
     {
-        public const byte DEFAULT_OBSTACLE_COUNT = 10;
+        public const byte DEFAULT_OBSTACLE_COUNT = 20;
         public const byte DEFAULT_CHECKPOINT_COUNT = 5;
-        public const byte DEFAULT_WIDTH = 10;
-        public const byte DEFAULT_HEIGHT = 10;
+        public const byte DEFAULT_WIDTH = 50;
+        public const byte DEFAULT_HEIGHT = 20;
         public const byte DEFAULT_WATER_AREA = 5;
 
         public Coord MapSize
@@ -50,7 +50,7 @@ namespace Orienteering
 
         public MapParams(uint width = DEFAULT_WIDTH, uint height = DEFAULT_HEIGHT, byte checkpointCount = DEFAULT_CHECKPOINT_COUNT, byte obstacleCount = DEFAULT_OBSTACLE_COUNT)
         {
-            _mapSize = new Coord(width, height);
+            _mapSize = new Coord(height, width);
             _checkpointCount = checkpointCount;
             _obstacleCount = obstacleCount;
         }

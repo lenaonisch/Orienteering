@@ -33,7 +33,10 @@ namespace Orienteering
             {    
                 if (!cell.Visible)
                 {
-                    PrintBlack(cell.Position);
+                    Console.SetCursorPosition((int)(_canvasOffset.x + cell.Position.x), (int)(_canvasOffset.y + cell.Position.y));
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(".");
+                    //PrintBlack(cell.Position);
                     return;
                 }
 
@@ -148,7 +151,8 @@ namespace Orienteering
             Console.Write('\u2510');
             for (int i = 1; i <= height; i++) // |     |
             {
-                Console.SetCursorPosition(x, y + i);
+                Console.SetCursorPosition(x-2, y + i);
+                Console.Write("{0:00}", i-1);
                 Console.Write('\u2502');
                 Console.SetCursorPosition(x + width, y + i);
                 Console.Write('\u2502');
@@ -195,9 +199,8 @@ namespace Orienteering
         #endregion
 
         #region interact with user
-        public Key GetUserInput()
+        private Key GetPressedKey()
         {
-            System.Threading.Thread.Sleep(20);
             Key kRet = Key.None;
             ConsoleKeyInfo keyInfo = Console.ReadKey(false);
             switch (keyInfo.Key)
@@ -215,30 +218,62 @@ namespace Orienteering
                     kRet = Key.Right;
                     break;
                 case ConsoleKey.Escape:
-                    EndGameEventArgs arg = new EndGameEventArgs();
-                    _endGame(this, ref arg);
                     kRet = Key.Escape;
                     break;
                 default:
                     Enum.TryParse(keyInfo.Key.ToString(), out kRet);
                     break;
             }
-
             return kRet;
+        }
+
+        public void GetUserInput()
+        {
+            System.Threading.Thread.Sleep(20);
+            Key kRet = GetPressedKey();
+            switch (kRet)
+            {
+                case Key.Down:
+                case Key.Up:
+                
+                case Key.Right:
+                case Key.Left:
+                    ChangePositionEventArgs cpargs = new ChangePositionEventArgs(kRet);
+                    _moveInitiated(this, cpargs);
+                    break;
+                case Key.Escape:
+                    GameControlEventArgs arg = new GameControlEventArgs();
+                    _endGame(this, ref arg);
+                        
+                    break;
+            }
         }
 
         public bool GetYesNoAnswer(string format, params object[] args)
         {
             PrintMessage(format, args);
-            Key k = GetUserInput();
-            if (k == Key.Y)
+            bool error = false;
+            bool yes = true;
+            do
             {
-                return true;
+                switch (GetPressedKey())
+                {
+                    case Key.Y:
+                        yes = true;
+                        error = false;
+                        break;
+                    case Key.N:
+                        yes = false;
+                        error = false;
+                        break;
+                    default:
+                        PrintError("Invalid input! Try once more: Y/N");
+                        error = true;
+                        break;
+                }
             }
-            else
-            {
-                return false;
-            }
+            while (error);
+            return yes;   
         }
 
         public GameType GetNewGameType()
@@ -248,7 +283,7 @@ namespace Orienteering
             do
             {
                 PrintMessage("Select game type: m - simple maze, o - orienteering, Esc - exit program");
-                switch (GetUserInput())
+                switch (GetPressedKey())
                 {
                     case Key.M:
                         gt = GameType.Maze;
@@ -257,7 +292,7 @@ namespace Orienteering
                         gt = GameType.Orienteering;
                         break;
                     case Key.Escape:
-                        EndGameEventArgs arg = new EndGameEventArgs();
+                        GameControlEventArgs arg = new GameControlEventArgs();
                         _endGame(this, ref arg);
                         break;
                     default:
@@ -302,7 +337,7 @@ namespace Orienteering
             ReprintChangedCells(args._cells);
         }
 
-        public void OnGameEnded(object sender, ref EndGameEventArgs args)
+        public void OnGameEnded(object sender, ref GameControlEventArgs args)
         {
             bool restart = true;
             if (sender == this)
@@ -319,14 +354,21 @@ namespace Orienteering
 
             if (args == null)
             {
-                args = new EndGameEventArgs();
+                args = new GameControlEventArgs();
             }
             args.StartNew = restart;
         }
 
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
         {
-            throw new NotImplementedException();
+            PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
+            PrintCell(args._cells[0]);
+        }
+
+        public void OnPersonMoved(object sender, ChangePositionEventArgs args)
+        {
+            PrintBlack(args.OldCoord);
+            PrintCell(args.NewCell);
         }
 
         EndGameDelegate _endGame;
@@ -341,7 +383,20 @@ namespace Orienteering
                 _endGame -= value;
             }
         }
-        #endregion
 
+        ChangePositionDelegate _moveInitiated;
+        public event ChangePositionDelegate MoveInitiated
+        {
+            add
+            {
+                _moveInitiated += value;
+            }
+            remove
+            {
+
+                _moveInitiated -= value;
+            }
+        }
+        #endregion
     }
 }

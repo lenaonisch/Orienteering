@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.gridMap = new System.Windows.Forms.DataGridView();
+            this.btnStartNew = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gridMap)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,11 +48,22 @@
             this.gridMap.TabIndex = 0;
             this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             // 
+            // btnStartNew
+            // 
+            this.btnStartNew.Location = new System.Drawing.Point(106, 227);
+            this.btnStartNew.Name = "btnStartNew";
+            this.btnStartNew.Size = new System.Drawing.Size(75, 23);
+            this.btnStartNew.TabIndex = 1;
+            this.btnStartNew.Text = "Start!";
+            this.btnStartNew.UseVisualStyleBackColor = true;
+            this.btnStartNew.Click += new System.EventHandler(this.btnStartNew_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.btnStartNew);
             this.Controls.Add(this.gridMap);
             this.Name = "frmMain";
             this.Text = "Main";
@@ -64,6 +76,7 @@
         #endregion
 
         private System.Windows.Forms.DataGridView gridMap;
+        private System.Windows.Forms.Button btnStartNew;
 
     }
 }

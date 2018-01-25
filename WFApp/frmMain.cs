@@ -18,6 +18,7 @@ namespace WFApp
         public frmMain()
         {
             InitializeComponent();
+            
         }
 
         public void PrintMessage(string format, params object[] args)
@@ -98,7 +99,7 @@ namespace WFApp
         #endregion
 
         Game _owner = null;
-
+        SuperController _sc = null;
 
         public Game CurrentGame
         {
@@ -112,9 +113,71 @@ namespace WFApp
             }
         }
 
+        private void PrintCell(Cell cell, DataGridViewCell gvcell)
+        {
+            string sVal = ".";
+            Color c = Color.White;
+            if (cell != null)
+            {
+                if (cell.Visible)
+                {
+
+                    if (cell is Person)
+                    {
+                        c = Color.Red;
+                        sVal = "P";
+                    }
+                    else
+                    {
+                        if (cell is Checkpoint)
+                        {
+                            c = Color.Yellow;
+                            sVal = "C";
+                        }
+                        else
+                        {
+                            switch ((cell as Obstacle)._type)
+                            {
+                                case ObstacleType.River:
+                                    c = Color.Blue;
+                                    sVal = "W";
+                                    break;
+                                case ObstacleType.Swamp:
+                                    c = Color.DarkGreen;
+                                    sVal = "S";
+                                    break;
+                                case ObstacleType.Tree:
+                                    c = Color.Green;
+                                    sVal = "T";
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                gvcell.Value = " ";
+            }
+
+            gvcell.Style.BackColor = c;
+            gvcell.Value = sVal;
+        }
+
         public void PrintMap(Map map)
         {
-            throw new NotImplementedException();
+            if (gridMap.RowCount == 0)
+            {
+                gridMap.Columns.AddRange(new DataGridViewColumn[map.Width]);
+                gridMap.Rows.AddRange(new DataGridViewRow[map.Height]);
+            }
+            for (uint x = 0; x < map.size.x; x++)
+            {
+                for (uint y = 0; y < map.size.y; y++)
+                {
+                    PrintCell(map[y, x], gridMap.Rows[(int)y].Cells[(int)x]);
+                }
+            }
         }
 
         public void ReprintChangedCells(params Cell[] cells)
@@ -160,9 +223,36 @@ namespace WFApp
             throw new NotImplementedException();
         }
 
-        public System.Windows.Input.Key GetUserInput()
+        public void GetUserInput()
         {
-            throw new NotImplementedException();
+            System.Threading.Thread.Sleep(20);
+            Key kRet = Key.None;
+            ConsoleKeyInfo keyInfo = Console.ReadKey(false);
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.DownArrow:
+                    kRet = Key.Down;
+                    break;
+                case ConsoleKey.UpArrow:
+                    kRet = Key.Up;
+                    break;
+                case ConsoleKey.LeftArrow:
+                    kRet = Key.Left;
+                    break;
+                case ConsoleKey.RightArrow:
+                    kRet = Key.Right;
+                    break;
+                case ConsoleKey.Escape:
+                    GameControlEventArgs arg = new GameControlEventArgs();
+                    _endGame(this, ref arg);
+                    kRet = Key.Escape;
+                    break;
+                default:
+                    Enum.TryParse(keyInfo.Key.ToString(), out kRet);
+                    break;
+            }
+
+            //return kRet;
         }
 
         public MapParams MapParameters
@@ -182,7 +272,7 @@ namespace WFApp
             throw new NotImplementedException();
         }
 
-        public void OnGameEnded(object sender, ref EndGameEventArgs args)
+        public void OnGameEnded(object sender, ref GameControlEventArgs args)
         {
             throw new NotImplementedException();
         }
@@ -191,9 +281,6 @@ namespace WFApp
         {
             throw new NotImplementedException();
         }
-
-        public event EndGameDelegate EndGame;
-
 
         public GameType GetNewGameType()
         {
@@ -204,5 +291,32 @@ namespace WFApp
         {
             throw new NotImplementedException();
         }
+
+        EndGameDelegate _endGame;
+        public event EndGameDelegate EndGame
+        {
+            add
+            {
+                _endGame += value;
+            }
+            remove
+            {
+                _endGame -= value;
+            }
+        }
+
+        private void btnStartNew_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public void OnPersonMoved(object sender, ChangePositionEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public event ChangePositionDelegate MoveInitiated;
     }
 }
