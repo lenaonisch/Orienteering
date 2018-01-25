@@ -52,11 +52,7 @@ namespace Orienteering
             // SuperController is subscribed on both events from view & game
             _game.EndGame += ProcessNewRound;
             _view.MoveInitiated += _game.MakeMove;
-            do
-            {  
-                _view.GetUserInput();
-            }
-            while (Active);
+            _view.GetUserInput();
         }
 
         public void ProcessNewRound(object sender, ref GameControlEventArgs args)

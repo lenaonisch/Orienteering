@@ -229,24 +229,28 @@ namespace Orienteering
 
         public void GetUserInput()
         {
-            System.Threading.Thread.Sleep(20);
-            Key kRet = GetPressedKey();
-            switch (kRet)
+            do
             {
-                case Key.Down:
-                case Key.Up:
-                
-                case Key.Right:
-                case Key.Left:
-                    ChangePositionEventArgs cpargs = new ChangePositionEventArgs(kRet);
-                    _moveInitiated(this, cpargs);
-                    break;
-                case Key.Escape:
-                    GameControlEventArgs arg = new GameControlEventArgs();
-                    _endGame(this, ref arg);
-                        
-                    break;
+                System.Threading.Thread.Sleep(20);
+                Key kRet = GetPressedKey();
+                switch (kRet)
+                {
+                    case Key.Down:
+                    case Key.Up:
+
+                    case Key.Right:
+                    case Key.Left:
+                        ChangePositionEventArgs cpargs = new ChangePositionEventArgs(kRet);
+                        _moveInitiated(this, cpargs);
+                        break;
+                    case Key.Escape:
+                        GameControlEventArgs arg = new GameControlEventArgs();
+                        _endGame(this, ref arg);
+
+                        break;
+                }
             }
+            while (true);
         }
 
         public bool GetYesNoAnswer(string format, params object[] args)

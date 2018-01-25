@@ -66,40 +66,39 @@ namespace WFApp
                     }
                     break;
                 case Keys.Down:
-                    _move(this, new ChangePositionEventArgs(Key.Down));
+                    _moveInitiated(this, new ChangePositionEventArgs(Key.Down));
                     break;
                 case Keys.Up:
-                    _move(this, new ChangePositionEventArgs(Key.Up));
+                    _moveInitiated(this, new ChangePositionEventArgs(Key.Up));
                     break;
                 case Keys.Left:
-                    _move(this, new ChangePositionEventArgs(Key.Left));
+                    _moveInitiated(this, new ChangePositionEventArgs(Key.Left));
                     break;
                 case Keys.Right:
-                    _move(this, new ChangePositionEventArgs(Key.Right));
+                    _moveInitiated(this, new ChangePositionEventArgs(Key.Right));
                     break;
                 default:
                     break;
             }
         }
 
-        #region events  
-        public event ChangePositionDelegate MakeMove
+        #region events 
+        ChangePositionDelegate _moveInitiated;
+        public event ChangePositionDelegate MoveInitiated
         {
             add
             {
-                _move += value;
+                _moveInitiated += value;
             }
             remove
             {
-                _move -= value;
+
+                _moveInitiated -= value;
             }
         }
-
-        ChangePositionDelegate _move;
         #endregion
 
         Game _owner = null;
-        SuperController _sc = null;
 
         public Game CurrentGame
         {
@@ -115,7 +114,7 @@ namespace WFApp
 
         private void PrintCell(Cell cell, DataGridViewCell gvcell)
         {
-            string sVal = ".";
+            string sVal = " ";
             Color c = Color.White;
             if (cell != null)
             {
@@ -155,22 +154,39 @@ namespace WFApp
                     }
                 }
             }
-            else
-            {
-                gvcell.Value = " ";
-            }
 
             gvcell.Style.BackColor = c;
             gvcell.Value = sVal;
         }
 
-        public void PrintMap(Map map)
+        private void CreateGrid(int width, int height)
         {
             if (gridMap.RowCount == 0)
             {
-                gridMap.Columns.AddRange(new DataGridViewColumn[map.Width]);
-                gridMap.Rows.AddRange(new DataGridViewRow[map.Height]);
+                DataGridViewColumn[] cols = new DataGridViewColumn[width];
+                for (int i = 0; i < width; i++)
+                {
+                    cols[i] = new DataGridViewTextBoxColumn();
+                    cols[i].Width = 25;
+                    cols[i].HeaderText = i.ToString();
+                }
+                gridMap.Columns.AddRange(cols);
+
+                string[] template = new string[] { "", "" };
+                DataGridViewRow[] rows = new DataGridViewRow[height];
+                for (int i = 0; i < height; i++)
+                {
+                    gridMap.Rows.Add(template);
+                    gridMap.Rows[i].HeaderCell.Value = i.ToString();
+                }
+                gridMap.Height = height * gridMap.Rows[0].Height + 25;
+                gridMap.Width = width * 25 + gridMap.RowHeadersWidth + 15;
             }
+        }
+
+        public void PrintMap(Map map)
+        {
+            CreateGrid((int)map.Width, (int)map.Height);
             for (uint x = 0; x < map.size.x; x++)
             {
                 for (uint y = 0; y < map.size.y; y++)
@@ -178,45 +194,16 @@ namespace WFApp
                     PrintCell(map[y, x], gridMap.Rows[(int)y].Cells[(int)x]);
                 }
             }
+           
         }
 
         public void ReprintChangedCells(params Cell[] cells)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < cells.Length; i++)
+            {
+                PrintCell(cells[i], GetCellByCoord(cells[i].Position));
+            }
         }
-
-        //public System.Windows.Input.Key GetUserInput()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public MapParams MapParameters
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
-
-        //public void OnCheckpointTaken(object sender, CellsEventArgs args)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public void OnGameEnded(object sender, EndGameEventArgs args)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public void OnHiddenChkpFound(object sender, CellsEventArgs args)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
 
         public void ShowHint(string hint, params object[] args)
         {
@@ -225,34 +212,7 @@ namespace WFApp
 
         public void GetUserInput()
         {
-            System.Threading.Thread.Sleep(20);
-            Key kRet = Key.None;
-            ConsoleKeyInfo keyInfo = Console.ReadKey(false);
-            switch (keyInfo.Key)
-            {
-                case ConsoleKey.DownArrow:
-                    kRet = Key.Down;
-                    break;
-                case ConsoleKey.UpArrow:
-                    kRet = Key.Up;
-                    break;
-                case ConsoleKey.LeftArrow:
-                    kRet = Key.Left;
-                    break;
-                case ConsoleKey.RightArrow:
-                    kRet = Key.Right;
-                    break;
-                case ConsoleKey.Escape:
-                    GameControlEventArgs arg = new GameControlEventArgs();
-                    _endGame(this, ref arg);
-                    kRet = Key.Escape;
-                    break;
-                default:
-                    Enum.TryParse(keyInfo.Key.ToString(), out kRet);
-                    break;
-            }
-
-            //return kRet;
+            frmMain_KeyDown(null, new System.Windows.Forms.KeyEventArgs(Keys.None));
         }
 
         public MapParams MapParameters
@@ -269,7 +229,8 @@ namespace WFApp
 
         public void OnCheckpointTaken(object sender, CellsEventArgs args)
         {
-            throw new NotImplementedException();
+            ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+            ReprintChangedCells(args._cells);
         }
 
         public void OnGameEnded(object sender, ref GameControlEventArgs args)
@@ -279,19 +240,11 @@ namespace WFApp
 
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
         {
-            throw new NotImplementedException();
+            PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
+            PrintCell(args._cells[0], GetCellByCoord(args._cells[0].Position));
         }
 
-        public GameType GetNewGameType()
-        {
-            throw new NotImplementedException();
-        }
-
-        public MapParams GetMapParameters()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         EndGameDelegate _endGame;
         public event EndGameDelegate EndGame
         {
@@ -305,18 +258,41 @@ namespace WFApp
             }
         }
 
-        private void btnStartNew_Click(object sender, EventArgs e)
+        public DataGridViewCell GetCellByCoord(Coord c)
         {
-
+            return gridMap.Rows[(int)c.y].Cells[(int)c.x];
         }
-
 
         public void OnPersonMoved(object sender, ChangePositionEventArgs args)
         {
-            throw new NotImplementedException();
+            PrintCell(null, GetCellByCoord(args.OldCoord));
+            PrintCell(args.NewCell, GetCellByCoord(args.NewCell.Position));
         }
 
+        #region parameters...
+        private void parametersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _parametersDialog.ShowDialog();
+        }
+        public GameType GetNewGameType()
+        {
+            return _parametersDialog.GetType();
+        }
 
-        public event ChangePositionDelegate MoveInitiated;
+        public MapParams GetMapParameters()
+        {
+            return _parametersDialog.GetMapParameters();
+        }
+        frmGameParams _parametersDialog = new frmGameParams();
+        #endregion
+
+        private void startNewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GameControlEventArgs arg = new GameControlEventArgs();
+            arg.StartNew = true;
+            arg.MapParameters = GetMapParameters();
+            arg.NewGameType = GetNewGameType();
+            _endGame(null, ref arg);
+        }
     }
 }

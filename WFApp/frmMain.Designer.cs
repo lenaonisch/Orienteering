@@ -29,54 +29,100 @@
         private void InitializeComponent()
         {
             this.gridMap = new System.Windows.Forms.DataGridView();
-            this.btnStartNew = new System.Windows.Forms.Button();
+            this.menuMain = new System.Windows.Forms.MenuStrip();
+            this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.parametersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.gridMap)).BeginInit();
+            this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // gridMap
             // 
             this.gridMap.AllowUserToAddRows = false;
             this.gridMap.AllowUserToDeleteRows = false;
+            this.gridMap.AllowUserToResizeColumns = false;
+            this.gridMap.AllowUserToResizeRows = false;
             this.gridMap.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.gridMap.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridMap.ColumnHeadersVisible = false;
-            this.gridMap.Location = new System.Drawing.Point(1, 2);
+            this.gridMap.Location = new System.Drawing.Point(3, 32);
             this.gridMap.Name = "gridMap";
             this.gridMap.ReadOnly = true;
-            this.gridMap.RowHeadersVisible = false;
+            this.gridMap.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.gridMap.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.gridMap.Size = new System.Drawing.Size(281, 189);
             this.gridMap.TabIndex = 0;
             this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             // 
-            // btnStartNew
+            // menuMain
             // 
-            this.btnStartNew.Location = new System.Drawing.Point(106, 227);
-            this.btnStartNew.Name = "btnStartNew";
-            this.btnStartNew.Size = new System.Drawing.Size(75, 23);
-            this.btnStartNew.TabIndex = 1;
-            this.btnStartNew.Text = "Start!";
-            this.btnStartNew.UseVisualStyleBackColor = true;
-            this.btnStartNew.Click += new System.EventHandler(this.btnStartNew_Click);
+            this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.gameToolStripMenuItem});
+            this.menuMain.Location = new System.Drawing.Point(0, 0);
+            this.menuMain.Name = "menuMain";
+            this.menuMain.Size = new System.Drawing.Size(284, 24);
+            this.menuMain.TabIndex = 2;
+            this.menuMain.Text = "menuStrip1";
+            // 
+            // gameToolStripMenuItem
+            // 
+            this.gameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startNewToolStripMenuItem,
+            this.parametersToolStripMenuItem,
+            this.exitToolStripMenuItem});
+            this.gameToolStripMenuItem.Name = "gameToolStripMenuItem";
+            this.gameToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.gameToolStripMenuItem.Text = "Game";
+            // 
+            // startNewToolStripMenuItem
+            // 
+            this.startNewToolStripMenuItem.Name = "startNewToolStripMenuItem";
+            this.startNewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startNewToolStripMenuItem.Text = "Start new";
+            this.startNewToolStripMenuItem.Click += new System.EventHandler(this.startNewToolStripMenuItem_Click);
+            // 
+            // parametersToolStripMenuItem
+            // 
+            this.parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
+            this.parametersToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.parametersToolStripMenuItem.Text = "Parameters...";
+            this.parametersToolStripMenuItem.Click += new System.EventHandler(this.parametersToolStripMenuItem_Click);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.btnStartNew);
             this.Controls.Add(this.gridMap);
+            this.Controls.Add(this.menuMain);
+            this.MainMenuStrip = this.menuMain;
             this.Name = "frmMain";
             this.Text = "Main";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.gridMap)).EndInit();
+            this.menuMain.ResumeLayout(false);
+            this.menuMain.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.DataGridView gridMap;
-        private System.Windows.Forms.Button btnStartNew;
+        private System.Windows.Forms.MenuStrip menuMain;
+        private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startNewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem parametersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 
     }
 }
