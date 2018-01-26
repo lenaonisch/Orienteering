@@ -23,7 +23,9 @@ namespace WFApp
 
         public void PrintMessage(string format, params object[] args)
         {
-            MessageBox.Show(String.Format(format, args), "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            lblMessage.ForeColor = Color.Black;
+            //MessageBox.Show(String.Format(format, args), "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            lblMessage.Text = String.Format(format, args);
         }
 
         public void PrintError(string format, params object[] args)
@@ -66,15 +68,19 @@ namespace WFApp
                     }
                     break;
                 case Keys.Down:
+                    lblMessage.Text = "";
                     _moveInitiated(this, new ChangePositionEventArgs(Key.Down));
                     break;
                 case Keys.Up:
+                    lblMessage.Text = "";
                     _moveInitiated(this, new ChangePositionEventArgs(Key.Up));
                     break;
                 case Keys.Left:
+                    lblMessage.Text = "";
                     _moveInitiated(this, new ChangePositionEventArgs(Key.Left));
                     break;
                 case Keys.Right:
+                    lblMessage.Text = "";
                     _moveInitiated(this, new ChangePositionEventArgs(Key.Right));
                     break;
                 default:
@@ -205,9 +211,11 @@ namespace WFApp
             }
         }
 
+        // убрать в отдельный контрол!!!!
         public void ShowHint(string hint, params object[] args)
         {
-            throw new NotImplementedException();
+            lblMessage.ForeColor = Color.Blue;
+            lblMessage.Text = String.Format(hint, args);
         }
 
         public void GetUserInput()
@@ -293,6 +301,14 @@ namespace WFApp
             arg.MapParameters = GetMapParameters();
             arg.NewGameType = GetNewGameType();
             _endGame(null, ref arg);
+        }
+    }
+
+    class BufferedDataGridView : DataGridView
+    {
+        public BufferedDataGridView()
+        {
+            DoubleBuffered = true;
         }
     }
 }
