@@ -28,33 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.gridMap = new BufferedDataGridView();
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parametersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblMessage = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).BeginInit();
+            this.gridMap = new WFApp.BufferedDataGridView();
             this.menuMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).BeginInit();
             this.SuspendLayout();
-            // 
-            // gridMap
-            // 
-            this.gridMap.AllowUserToAddRows = false;
-            this.gridMap.AllowUserToDeleteRows = false;
-            this.gridMap.AllowUserToResizeColumns = false;
-            this.gridMap.AllowUserToResizeRows = false;
-            this.gridMap.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.gridMap.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridMap.Location = new System.Drawing.Point(0, 50);
-            this.gridMap.Name = "gridMap";
-            this.gridMap.ReadOnly = true;
-            this.gridMap.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.gridMap.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.gridMap.Size = new System.Drawing.Size(284, 189);
-            this.gridMap.TabIndex = 0;
-            this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             // 
             // menuMain
             // 
@@ -104,6 +87,24 @@
             this.lblMessage.Size = new System.Drawing.Size(0, 13);
             this.lblMessage.TabIndex = 3;
             // 
+            // gridMap
+            // 
+            this.gridMap.AllowUserToAddRows = false;
+            this.gridMap.AllowUserToDeleteRows = false;
+            this.gridMap.AllowUserToResizeColumns = false;
+            this.gridMap.AllowUserToResizeRows = false;
+            this.gridMap.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.gridMap.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridMap.Location = new System.Drawing.Point(0, 50);
+            this.gridMap.Name = "gridMap";
+            this.gridMap.ReadOnly = true;
+            this.gridMap.RowHeadersWidth = 35;
+            this.gridMap.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this.gridMap.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.gridMap.Size = new System.Drawing.Size(284, 189);
+            this.gridMap.TabIndex = 0;
+            this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -117,9 +118,9 @@
             this.Name = "frmMain";
             this.Text = "Main";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
-            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).EndInit();
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

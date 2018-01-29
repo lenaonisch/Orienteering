@@ -27,8 +27,8 @@ namespace Orienteering
                     if (_map.AreAllCheckpointsTaken())
                     {
                         GameControlEventArgs endArgs = new GameControlEventArgs();
-                        endArgs.Score = this.Score;
                         _endGame(this, ref endArgs); // no restart, no interrupt
+                        return;
                     }
                 }
                 _player.Move(newCoord);

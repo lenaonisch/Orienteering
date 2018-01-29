@@ -93,7 +93,7 @@ namespace Orienteering
             }
         }
 
-        public void ReprintChangedCells(params Cell[] cells)
+        public void PrintCells(params Cell[] cells)
         {
             foreach (Cell c in cells)
             {
@@ -169,6 +169,12 @@ namespace Orienteering
             Console.ForegroundColor = cc;
         }
 
+        public void PrintNullCell(Coord coord) // print cell with background
+        {
+            Console.SetCursorPosition((int)(_canvasOffset.x + coord.x), (int)(_canvasOffset.y + coord.y));
+            PrintBlack();
+        }
+
         private void PrintBlack(int len = 1)
         {
             char[] cs = new char[len];
@@ -181,11 +187,7 @@ namespace Orienteering
             Console.Write(new string(cs));
             Console.ForegroundColor = cc;
         }
-        private void PrintBlack(Coord c)
-        {
-            Console.SetCursorPosition((int)(_canvasOffset.x + c.x), (int)(_canvasOffset.y + c.y));
-            PrintBlack();
-        }
+
         private void PrintBlack(uint y, uint x)
         {
             Console.SetCursorPosition((int)(_canvasOffset.x + x), (int)(_canvasOffset.y + y));
@@ -227,7 +229,7 @@ namespace Orienteering
             return kRet;
         }
 
-        public void GetUserInput()
+        private void GetUserInput()
         {
             do
             {
@@ -250,7 +252,7 @@ namespace Orienteering
                         break;
                 }
             }
-            while (true);
+            while (!exit);
         }
 
         public bool GetYesNoAnswer(string format, params object[] args)
@@ -335,48 +337,9 @@ namespace Orienteering
         #endregion
 
         #region events, handlers...
-        public void OnCheckpointTaken(object sender, CellsEventArgs args)
-        {
-            ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
-            ReprintChangedCells(args._cells);
-        }
 
-        public void OnGameEnded(object sender, ref GameControlEventArgs args)
-        {
-            bool restart = true;
-            if (sender == this)
-            {
-                if (GetYesNoAnswer("Do you really want to exit? Y/N"))
-                {
-                    restart = false;
-                }
-            }
-            else
-            {
-                restart = GetYesNoAnswer("Press Y to repeat: ?");
-            }
-
-            if (args == null)
-            {
-                args = new GameControlEventArgs();
-            }
-            args.StartNew = restart;
-        }
-
-        public void OnHiddenChkpFound(object sender, CellsEventArgs args)
-        {
-            PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
-            PrintCell(args._cells[0]);
-        }
-
-        public void OnPersonMoved(object sender, ChangePositionEventArgs args)
-        {
-            PrintBlack(args.OldCoord);
-            PrintCell(args.NewCell);
-        }
-
-        EndGameDelegate _endGame;
-        public event EndGameDelegate EndGame
+        GameControlDelegate _endGame;
+        public event GameControlDelegate EndGame
         {
             add
             {
@@ -401,6 +364,50 @@ namespace Orienteering
                 _moveInitiated -= value;
             }
         }
+
+        public void OnCheckpointTaken(object sender, CellsEventArgs args)
+        {
+            ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+            PrintCells(args._cells);
+        }
+
+        public void OnHiddenChkpFound(object sender, CellsEventArgs args)
+        {
+            PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
+            PrintCells(args._cells[0]);
+        }
+
+        public void OnPersonMoved(object sender, ChangePositionEventArgs args)
+        {
+            PrintNullCell(args.OldCoord);
+            PrintCells(args.NewCell);
+        }
         #endregion
+
+        public void ShowResults(GameResults gr)
+        {
+            PrintMessage("Scored: {0} points in time {1}", gr.Score, gr.SecondsPassed);
+        }
+        public void LaunchNewGame(Map map)
+        {
+            PrintMap(map);
+            GetUserInput();
+        }
+
+        public event GameControlDelegate StartGame;
+
+
+        public bool exit
+        {
+            get
+            {
+                return _exit;
+            }
+            set
+            {
+                _exit = value;
+            }
+        }
+        private bool _exit = false;
     }
 }

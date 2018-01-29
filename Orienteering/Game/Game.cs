@@ -9,10 +9,12 @@ namespace Orienteering
 {
     public abstract class Game
     {
-        public virtual void OnGameEnded(object sender, ref GameControlEventArgs args)
+        public virtual GameResults GetGameResults()
         {
             _timer.Stop();
-            args.SecondsPassed = _timer.ElapsedMilliseconds / 1000;
+            GameResults gr = new GameResults(){SecondsPassed = _timer.ElapsedMilliseconds / 1000, Score = Score};
+
+            return gr;
         }
         public abstract void MakeMove(object sender, ChangePositionEventArgs args);
         public abstract Game InitNew(MapParams parameters);
@@ -96,8 +98,8 @@ namespace Orienteering
         //}
 
         //public ChangePositionDelegate _move;
-        protected EndGameDelegate _endGame;
-        public event EndGameDelegate EndGame
+        protected GameControlDelegate _endGame;
+        public event GameControlDelegate EndGame
         {
             add
             {

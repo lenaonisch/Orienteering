@@ -54,6 +54,7 @@
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\GameMaze.cs" />
     <Compile Include="Game\GameOrienteering.cs" />
+    <Compile Include="Game\GameResults.cs" />
     <Compile Include="Map\MapParams.cs" />
     <Compile Include="Game\GameType.cs" />
     <Compile Include="Map\Map.cs" />

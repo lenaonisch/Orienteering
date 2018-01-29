@@ -12,8 +12,8 @@ namespace Orienteering
         public SuperController(IView view)
         {
             _view = view;
-            _view.EndGame += ProcessNewRound;
-            
+            _view.EndGame += OnEndGame;
+            _view.StartGame += ProcessNewRound;
             Active = false;
         }
 
@@ -24,6 +24,7 @@ namespace Orienteering
 
         private void CreateNewGame(GameType gt, MapParams parameters)
         {
+            Unsubscribe();
             switch (gt)
             {
                 case GameType.Maze:
@@ -33,11 +34,11 @@ namespace Orienteering
                     _game = new GameOrienteering();
                     break;
                 default:
-                    break;
+                    throw new GameUndefinedException();
             }
             _game.InitNew(parameters);
-            _view.CurrentGame = _game;
-            _view.PrintMap(_game.Map);
+            //_view.CurrentGame = _game;
+            //_view.PrintMap(_game.Map);
             Active = true;
         }
 
@@ -50,31 +51,73 @@ namespace Orienteering
 
 
             // SuperController is subscribed on both events from view & game
-            _game.EndGame += ProcessNewRound;
+            _game.EndGame += OnEndGame;
             _view.MoveInitiated += _game.MakeMove;
-            _view.GetUserInput();
+  /////////          _view.GetUserInput();
+        }
+
+        public void Unsubscribe()
+        {
+            if (_game != null)
+            {
+                _view.MoveInitiated -= _game.MakeMove;
+                _game.Player.PlayerMoved -= _view.OnPersonMoved;
+                _game.CheckpointWasTaken -= _view.OnCheckpointTaken;
+                _game.FoundSurrondingCheckpoint -= _view.OnHiddenChkpFound;
+
+                _game.EndGame -= OnEndGame;
+            }
+        }
+
+        public void OnEndGame(object sender, ref GameControlEventArgs args)
+        {
+            //bool restart = false;
+            //bool exit = false;
+            if (_game != null)
+            {
+                if (sender == _game)
+                {
+                    _view.ShowResults(_game.GetGameResults());
+                    Active = false;
+                }
+                else
+                {
+                    if (_view.GetYesNoAnswer("Do you want to finish?"))
+                    {
+                        Active = false;
+                    }
+                }
+                if (!Active)
+                {
+                    if (_view.GetYesNoAnswer("Do you want to start new?"))
+                    {
+                        args.StartNew = true;
+                        args.MapParameters = _view.GetMapParameters();
+                        args.NewGameType = _view.GetNewGameType();
+                        ProcessNewRound(this, ref args);
+                    }
+                    else
+                    {
+                        _view.exit = true;
+                    }
+                }
+            }
+            else
+            {
+                if (_view.GetYesNoAnswer("Do you really want to exit?"))
+                {
+                    _view.exit = true;
+                }
+            }
         }
 
         public void ProcessNewRound(object sender, ref GameControlEventArgs args)
         {
-            if (sender != null)
-            {
-                _view.OnGameEnded(sender, ref args);
-            }
             if (args != null && args.StartNew)
             {
-                if (_game != null)
-                {
-                    ////??????????
-                    _view.MoveInitiated -= _game.MakeMove; 
-                    _game.Player.PlayerMoved -= _view.OnPersonMoved;
-                }
-                CreateNewGame();
+                CreateNewGame(args.NewGameType, args.MapParameters);
                 PlayTheGame();
-            }
-            else  
-            {
-                Active = false;
+                _view.LaunchNewGame(_game.Map);
             }
         }
 

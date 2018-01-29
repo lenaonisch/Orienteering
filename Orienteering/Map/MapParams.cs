@@ -10,8 +10,8 @@ namespace Orienteering
     {
         public const byte DEFAULT_OBSTACLE_COUNT = 20;
         public const byte DEFAULT_CHECKPOINT_COUNT = 5;
-        public const byte DEFAULT_WIDTH = 50;
-        public const byte DEFAULT_HEIGHT = 20;
+        public const byte DEFAULT_WIDTH = 20;
+        public const byte DEFAULT_HEIGHT = 10;
         public const byte DEFAULT_WATER_AREA = 5;
 
         public Coord MapSize

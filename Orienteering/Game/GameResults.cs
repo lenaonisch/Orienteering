@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace Orienteering
 {
-    public enum GameType
+    public class GameResults
     {
-        None,
-        Maze,
-        Orienteering
-    }
-
-    public class GameUndefinedException : Exception
-    {
-        
+        public int Score { get; set; }
+        public long SecondsPassed { get; set; }
     }
 }

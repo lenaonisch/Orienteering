@@ -54,8 +54,6 @@ namespace Orienteering
         public bool StartNew { get; set; }
         public MapParams MapParameters { get; set; }
         public GameType NewGameType { get; set; }
-        public int Score { get; set; }
-        public long SecondsPassed { get; set; }
         //public bool Aborted { get; set; } // true - if game was finished itself, false - user interrupted it on the middle
     }
 
@@ -75,7 +73,7 @@ namespace Orienteering
         }
     }
 
-    public delegate void EndGameDelegate(object sender, ref GameControlEventArgs args);
+    public delegate void GameControlDelegate(object sender, ref GameControlEventArgs args);
     public delegate void ChangePositionDelegate(object sender, ChangePositionEventArgs args);
     public delegate void CellsAffectedDelegate(object sender, CellsEventArgs args);
 }
