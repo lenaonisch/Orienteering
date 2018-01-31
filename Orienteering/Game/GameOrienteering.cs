@@ -32,40 +32,28 @@ namespace Orienteering
                     }
                 }
                 _player.Move(newCoord);
-                Checkpoint[] surround;
-                if (_map.AreCheckpointsClose(_player.Position, out surround, false, _player.ViewRadius)) // if some checkpoints are close - give possibility for player to know about it
+                uint R = _player.ViewRadius;
+                Checkpoint[] surround = new Checkpoint[(2 * R + 1) * (2 * R + 1) - 1];
+                uint chkpFound = 0;
+                for (uint layer = 1; layer <= R; layer++)
                 {
-                    CellsEventArgs arg = new CellsEventArgs(surround);
-                    Direction dToMin = Direction.NoDirection;
-                    arg._direct = new Direction[surround.Length];
-                    arg._len = new uint[surround.Length];
-                    for (int i = 0; i < surround.Length; i++)
+                    if (_map.CheckSquareForCheckpoint(_player.Position, layer, ref chkpFound, ref surround))
                     {
-                        arg._direct[i] = DefineDirectionToEndPoint(_player.Position, surround[i].Position, out arg._len[i]);
-                    }
-                    //////
-                    int inearest = -1;
-                    uint minLen = uint.MaxValue;
-                    for (int i = 0; i < surround.Length; i++)
-                    {
-                        if (arg._len[i] < minLen)
+                        Array.Resize(ref surround, (int)chkpFound);
+                        CellsEventArgs arg = new CellsEventArgs(surround);
+                        arg._direct = new Direction[surround.Length];
+                        arg._len = new uint[surround.Length];
+                        for (int i = 0; i < surround.Length; i++)
                         {
-                            minLen = arg._len[i];
-                            inearest = i;
-                            dToMin = arg._direct[i];
+                            arg._direct[i] = DefineDirectionToEndPoint(_player.Position, surround[i].Position, out arg._len[i]);
+                            if (surround[i].SeenRadius >= layer)
+                            {
+                                _map[surround[i].Position].Visible = true;
+                            }
                         }
+                        _chkpSurrondingFound(this, arg);
+                        break;
                     }
-                    if ((surround[inearest] as Checkpoint).SeenRadius >= minLen)
-                    {
-                        
-                        _map[surround[inearest].Position].Visible = true;
-
-                    }
-                    /////
-                    arg._len[0] = minLen;
-                    arg._direct[0] = dToMin;
-                    arg._cells[0] = _map[surround[inearest].Position];
-                    _chkpSurrondingFound(this, arg);
                 }
             }
         }

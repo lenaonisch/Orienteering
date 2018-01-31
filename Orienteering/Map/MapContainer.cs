@@ -72,6 +72,14 @@ namespace Orienteering
         }
 
         #region IsCell...
+        public bool IsCheckpoint(int y, int x, out Checkpoint chkp)
+        {
+            if (y < 0 || x < 0)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("y and x should be non-negative. y = {0}, x = {1}", y, x));
+            }
+            return IsCheckpoint((uint)y, (uint)x, out chkp);
+        }
         public bool IsCheckpoint(uint y, uint x, out Checkpoint chkp)
         {
             chkp = Field[y, x] as Checkpoint;

@@ -56,6 +56,11 @@ namespace WFApp
                 return false;
             }
         }
+
+        public void ShowResults(GameResults gr)
+        {
+            PrintWarning("Scored: {0} points in time {1}", gr.Score, gr.SecondsPassed);
+        }
         #endregion
 
         #region WF events
@@ -86,6 +91,14 @@ namespace WFApp
                 default:
                     break;
             }
+        }
+        private void startNewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GameControlEventArgs arg = new GameControlEventArgs();
+            arg.StartNew = true;
+            arg.MapParameters = GetMapParameters();
+            arg.NewGameType = GetNewGameType();
+            _startGame(null, ref arg);
         }
         #endregion
 
@@ -130,20 +143,6 @@ namespace WFApp
         }
         #endregion
 
-        //Game _owner = null;
-
-        //public Game CurrentGame
-        //{
-        //    get
-        //    {
-        //        return _owner;
-        //    }
-        //    set
-        //    {
-        //        _owner = value;
-        //    }
-        //}
-
         #region cell & map printing, create grid...
         private void PrintCell(Cell cell, DataGridViewCell gvcell)
         {
@@ -185,6 +184,10 @@ namespace WFApp
                             }
                         }
                     }
+                }
+                else
+                {
+                    sVal = "*";
                 }
             }
 
@@ -284,7 +287,7 @@ namespace WFApp
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
         {
             PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
-            PrintCells(args._cells[0]);
+            PrintCells(args._cells);
         }
 
         public void OnPersonMoved(object sender, ChangePositionEventArgs args)
@@ -311,16 +314,6 @@ namespace WFApp
         frmGameParams _parametersDialog = new frmGameParams();
         #endregion
 
-        private void startNewToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GameControlEventArgs arg = new GameControlEventArgs();
-            arg.StartNew = true;
-            arg.MapParameters = GetMapParameters();
-            arg.NewGameType = GetNewGameType();
-            _startGame(null, ref arg);
-        }
-
-
         public void LaunchNewGame(Map map)
         {
             PrintMap(map);
@@ -342,11 +335,6 @@ namespace WFApp
             }
         }
 
-
-        public void ShowResults(GameResults gr)
-        {
-            PrintWarning("Scored: {0} points in time {1}", gr.Score, gr.SecondsPassed);
-        }
     }
 
     class BufferedDataGridView : DataGridView

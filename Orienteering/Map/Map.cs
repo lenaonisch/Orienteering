@@ -10,51 +10,90 @@ namespace Orienteering
     {
         #region checkpoints
 
-        public bool AreCheckpointsClose(Coord c, out Checkpoint[] checkpoints, bool taken = false, uint r = 1)
+        private void CheckCpiralFromCenter(Coord center, ref Checkpoint[] result, uint R = 1)
         {
-            int Ystart = (int)c.y - (int)r;
-            int Xstart = (int)c.x - (int)r;
+            uint start = 0;
+            for (uint layer = 1; layer <= R; layer++)
+            {
+                CheckSquareForCheckpoint(center, layer, ref start, ref result);
+            }
+        }
+
+        public bool CheckSquareForCheckpoint(Coord center, uint layer, ref uint start_index, ref Checkpoint[] result)
+        {
+            uint already_found = start_index;
+
+            #region min-max coord
+            bool top = true, right = true, bottom = true, left = true;
+            int Ystart = (int)center.y - (int)layer;
+            int Xstart = (int)center.x - (int)layer;
             if (Ystart < 0)
             {
+                top = false;
                 Ystart = 0;
             }
             if (Xstart < 0)
             {
+                left = false;
                 Xstart = 0;
             }
 
-            int Ystop = (int)c.y + (int)r;
-            int Xstop = (int)c.x + (int)r;
-            if (Ystop > Height)
+            int Ystop = (int)center.y + (int)layer;
+            int Xstop = (int)center.x + (int)layer;
+            if (Ystop >= Height)
             {
-                Ystop = (int)Height;
+                bottom = false;
+                Ystop = (int)Height - 1;
             }
-            if (Xstop > Width)
+            if (Xstop >= Width)
             {
-                Xstop = (int)Width;
+                right = false;
+                Xstop = (int)Width - 1;
             }
+            #endregion
 
-            checkpoints = new Checkpoint[(2 * r + 1) * (2 * r + 1) - 1];
-            int found = 0;
-            for (uint y = (uint)Ystart; y < Ystop; y++)
+            if (top)
             {
-                for (uint x = (uint)Xstart; x < Xstop; x++)
+                for (int j = Xstart; j <= Xstop; j++)
                 {
-                    if (!IsCheckpoint(y, x, out checkpoints[found]) || (y == c.y && x == c.x))
+                    if (IsCheckpoint(Ystart, j++, out result[start_index]))
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        if (checkpoints[found].Taken == taken)
-                        {
-                            ++found;
-                        }
+                        ++start_index;
                     }
                 }
             }
-            Array.Resize(ref checkpoints, found);
-            return found != 0;
+            if (right)
+            {
+                for (int i = top ? Ystart+1:Ystart; i <= Ystop; i++)
+                {
+                    if (IsCheckpoint(i, Xstop, out result[start_index]))
+                    {
+                        ++start_index;
+                    }
+                }
+            }
+            if (bottom)
+            {
+                for (int j = right?Xstop-1 :Xstop ; j >= Xstart; j--)
+                {
+                    if (IsCheckpoint(Ystop, j, out result[start_index]))
+                    {
+                        ++start_index;
+                    }
+                }
+            }
+            if (left)
+            {
+                for (int i = bottom? Ystop-1: Ystop; i > Ystart; i--)
+                {
+                    if (IsCheckpoint(i, Xstart, out result[start_index]))
+                    {
+                        ++start_index;
+                    }
+                }
+            }
+
+            return already_found != start_index;
         }
 
         public bool AreAllCheckpointsTaken()
