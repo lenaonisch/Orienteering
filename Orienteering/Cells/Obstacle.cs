@@ -38,11 +38,11 @@ namespace Orienteering
         {
             get
             {
-                return _owner[coordinates[i]];
+                return cells[i];
             }
             set
             {
-                _owner[coordinates[i]] = value;
+                cells[i] = value;
             }
         }
         #endregion
@@ -58,10 +58,10 @@ namespace Orienteering
             {
                 case ObstacleType.River:
                 case ObstacleType.Swamp:
-                    obstacle = Water.CreateRandom(map, square, type);
+                    Water.CreateRandom(map, square, type);
                     break;
                 case ObstacleType.Tree:
-                    obstacle = Tree.CreateRandom(map);
+                    Tree.CreateRandom(map);
                     break;
             }
             return obstacle;
@@ -119,7 +119,8 @@ namespace Orienteering
 //            }
 //        }
 
-        public Coord[] coordinates; // offsets of points
+        //public Coord[] coordinates; // offsets of points
+        public Cell[] cells;
         protected uint _square;
         public ObstacleType _type
         {

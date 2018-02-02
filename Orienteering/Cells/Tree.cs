@@ -20,7 +20,7 @@ namespace Orienteering
         {
             _square = 1;
             _type = ObstacleType.Tree;
-            coordinates = new Coord[] {coord};
+            owner[coord] = this;
         }
 
         public Tree(Tree t)
@@ -31,9 +31,9 @@ namespace Orienteering
             return new Tree(this);
         }
 
-        public static Tree CreateRandom(Map map)
+        public static void CreateRandom(Map map)
         {
-            return new Tree(map, map.GetRandomEmptyCell());
+            new Tree(map, map.GetRandomEmptyCell());
         }
     }
 }
