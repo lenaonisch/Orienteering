@@ -47,6 +47,12 @@ namespace Orienteering
                     Console.Write("P");
                     return;
                 }
+                if (cell is Crossing)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write("-");
+                    return;
+                }
                 if (cell is Checkpoint)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -55,7 +61,7 @@ namespace Orienteering
                 }
                 else
                 {
-                    switch ((cell as Obstacle)._type)
+                    switch ((cell as Obstacle).Type)
                     {
                         case ObstacleType.River:
                             Console.ForegroundColor = ConsoleColor.Blue;
@@ -77,9 +83,9 @@ namespace Orienteering
         public void PrintMap(Map map)
         {
             PrintBounds(new Coord(_canvasOffset.y - 1, _canvasOffset.x - 1), new Coord(_canvasOffset.y + map.Height, _canvasOffset.x + map.Width));
-            for (uint x = 0; x < map.size.x; x++)
+            for (uint x = 0; x < map.Size.x; x++)
             {
-                for (uint y = 0; y < map.size.y; y++)
+                for (uint y = 0; y < map.Size.y; y++)
                 {
                     if (map[y, x] == null)
                     {
@@ -169,10 +175,16 @@ namespace Orienteering
             Console.ForegroundColor = cc;
         }
 
-        public void PrintNullCell(Coord coord) // print cell with background
+        public void PrintCell(Coord coord, Cell cell) // print cell with background
         {
-            Console.SetCursorPosition((int)(_canvasOffset.x + coord.x), (int)(_canvasOffset.y + coord.y));
-            PrintBlack();
+            if (cell == null)
+            {
+                PrintBlack(coord.y, coord.x);
+            }
+            else
+            {
+                PrintCell(cell);
+            }
         }
 
         private void PrintBlack(int len = 1)
@@ -364,6 +376,12 @@ namespace Orienteering
                 _moveInitiated -= value;
             }
         }
+        public event CrossingDelegate CrossingCreationInitiated
+        {
+            add { _crossingInitiated += value; }
+            remove { _crossingInitiated -= value; }
+        }
+        CrossingDelegate _crossingInitiated;
 
         public void OnCheckpointTaken(object sender, CellsEventArgs args)
         {
@@ -379,8 +397,14 @@ namespace Orienteering
 
         public void OnPersonMoved(object sender, ChangePositionEventArgs args)
         {
-            PrintNullCell(args.OldCoord);
+            //PrintNullCell(args.OldCoord);
+            PrintCell(args.OldCoord, args.OldCell);
             PrintCells(args.NewCell);
+        }
+
+        public void OnCrossingCreated(object sender, CellsEventArgs args)
+        {
+            PrintCells(args._cells);
         }
         #endregion
 

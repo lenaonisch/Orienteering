@@ -32,6 +32,7 @@ namespace Orienteering
                     }
                 }
                 _player.Move(newCoord);
+                
                 uint R = _player.ViewRadius;
                 Checkpoint[] surround = new Checkpoint[(2 * R + 1) * (2 * R + 1) - 1];
                 uint chkpFound = 0;

@@ -15,11 +15,7 @@ namespace ConsoleApp
             ConsoleView view = new ConsoleView(ConsoleView.DEFAULT_MAP_OFFSET);
             SuperController sc = new SuperController(view);
             GameControlEventArgs tmp = new GameControlEventArgs() {StartNew = true, NewGameType = view.GetNewGameType(), MapParameters = view.GetMapParameters()}; 
-            //do
-            //{
-                sc.ProcessNewRound(null, ref tmp); 
-            //}
-            //while (sc.Active);
+            sc.ProcessNewRound(null, ref tmp); 
         }
     }
 }

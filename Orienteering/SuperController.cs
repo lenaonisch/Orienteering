@@ -37,8 +37,6 @@ namespace Orienteering
                     throw new GameUndefinedException();
             }
             _game.InitNew(parameters);
-            //_view.CurrentGame = _game;
-            //_view.PrintMap(_game.Map);
             Active = true;
         }
 
@@ -48,12 +46,14 @@ namespace Orienteering
             _game.CheckpointWasTaken += _view.OnCheckpointTaken;
             _game.FoundSurrondingCheckpoint += _view.OnHiddenChkpFound;
             _game.Player.PlayerMoved += _view.OnPersonMoved;
-
+            _view.CrossingCreationInitiated += _game.Player.MakeCross;
+            _game.Player.CrossingCreated += _view.OnCrossingCreated;
 
             // SuperController is subscribed on both events from view & game
             _game.EndGame += OnEndGame;
             _view.MoveInitiated += _game.MakeMove;
-  /////////          _view.GetUserInput();
+
+
         }
 
         public void Unsubscribe()
@@ -65,14 +65,15 @@ namespace Orienteering
                 _game.CheckpointWasTaken -= _view.OnCheckpointTaken;
                 _game.FoundSurrondingCheckpoint -= _view.OnHiddenChkpFound;
 
+                _view.CrossingCreationInitiated -= _game.Player.MakeCross;
+                _game.Player.CrossingCreated -= _view.OnCrossingCreated;
+
                 _game.EndGame -= OnEndGame;
             }
         }
 
         public void OnEndGame(object sender, ref GameControlEventArgs args)
         {
-            //bool restart = false;
-            //bool exit = false;
             if (_game != null)
             {
                 if (sender == _game)

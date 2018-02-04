@@ -85,18 +85,6 @@ namespace Orienteering
         protected CellsAffectedDelegate _chkpTaken;
         protected CellsAffectedDelegate _chkpSurrondingFound;
         
-        //public event ChangePositionDelegate PlayerMoved
-        //{
-        //    add
-        //    {
-        //        _move += value;
-        //    }
-        //    remove
-        //    {
-        //        _move -= value;
-        //    }
-        //}
-
         //public ChangePositionDelegate _move;
         protected GameControlDelegate _endGame;
         public event GameControlDelegate EndGame

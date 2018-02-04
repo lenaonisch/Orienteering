@@ -28,11 +28,6 @@ namespace Orienteering
         
         #endregion
 
-        public bool Validate(int y, int x)
-        {
-            return (x >= 0 && y >= 0 && x < _owner.size.x && y < _owner.size.y);
-        }
-
         public Coord Position
         {
             get { return _position; }

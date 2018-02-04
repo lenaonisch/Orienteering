@@ -9,20 +9,20 @@ namespace Orienteering
         public Map(Coord size)
         {
             Field = new Cell[size.y, size.x];
-            this.size = size;
+            this.Size = size;
         }
 
         public Checkpoint[] Checkpoints; // just references on cells!
         public Cell[,] Field;
         
 
-        public Coord size { get; private set; }
+        public Coord Size { get; private set; }
 
         public uint Height
         {
             get
             {
-                return size.y;
+                return Size.y;
             }
         }
 
@@ -30,7 +30,7 @@ namespace Orienteering
         {
             get
             {
-                return size.x;
+                return Size.x;
             }
         }
 
@@ -64,8 +64,8 @@ namespace Orienteering
 
             do
             {
-                x = Randomizer.Next(0, size.x);
-                y = Randomizer.Next(0, size.y);
+                x = Randomizer.Next(0, Size.x);
+                y = Randomizer.Next(0, Size.y);
             }
             while (Field[y, x] != null);
             return new Coord(y, x);
@@ -76,7 +76,7 @@ namespace Orienteering
         {
             if (y < 0 || x < 0)
             {
-                throw new ArgumentOutOfRangeException(String.Format("y and x should be non-negative. y = {0}, x = {1}", y, x));
+                throw new CoordOutOfMapException(String.Format("y and x should be non-negative. y = {0}, x = {1}", y, x), y, x);
             }
             return IsCheckpoint((uint)y, (uint)x, out chkp);
         }

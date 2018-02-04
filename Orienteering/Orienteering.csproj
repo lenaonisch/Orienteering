@@ -47,9 +47,12 @@
   <ItemGroup>
     <Compile Include="Cells\Cell.cs" />
     <Compile Include="Cells\Checkpoint.cs" />
+    <Compile Include="Cells\Crossing.cs" />
+    <Compile Include="Cells\CrossingType.cs" />
     <Compile Include="Cells\Tree.cs" />
     <Compile Include="Cells\Water.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Coord.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\GameMaze.cs" />

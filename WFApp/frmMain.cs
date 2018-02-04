@@ -66,32 +66,48 @@ namespace WFApp
         #region WF events
         private void frmMain_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            switch (e.KeyData)
+            switch (e.KeyCode)
             {
                 case Keys.Escape:
                     GameControlEventArgs gcargs = new GameControlEventArgs();
                     _endGame(this, ref gcargs);
                     break;
-                case Keys.Down:
-                    lblMessage.Text = "";
-                    _moveInitiated(this, new ChangePositionEventArgs(Key.Down));
-                    break;
+                case Keys.Down:   
                 case Keys.Up:
-                    lblMessage.Text = "";
-                    _moveInitiated(this, new ChangePositionEventArgs(Key.Up));
-                    break;
-                case Keys.Left:
-                    lblMessage.Text = "";
-                    _moveInitiated(this, new ChangePositionEventArgs(Key.Left));
-                    break;
+                case Keys.Left:   
                 case Keys.Right:
                     lblMessage.Text = "";
-                    _moveInitiated(this, new ChangePositionEventArgs(Key.Right));
+                    Key key;
+                    Enum.TryParse(e.KeyData.ToString(), out key);
+                    if (e.Shift)
+                    {
+                        switch (e.KeyValue)
+                        {
+                            case 37:
+                                key = Key.Left;
+                                break;
+                            case 38:
+                                key = Key.Up;
+                                break;
+                            case 39:
+                                key = Key.Right;
+                                break;
+                            case 40:
+                                key = Key.Down;
+                                break;
+                        }
+                        _crossingInitiated(this, new CrossingEventArgs(key) { Type = CrossingType.Rope});
+                    }
+                    else
+                    {
+                        _moveInitiated(this, new ChangePositionEventArgs(key));
+                    }
                     break;
                 default:
                     break;
             }
         }
+
         private void startNewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GameControlEventArgs arg = new GameControlEventArgs();
@@ -141,6 +157,13 @@ namespace WFApp
                 _endGame -= value;
             }
         }
+
+        public event CrossingDelegate CrossingCreationInitiated
+        {
+            add { _crossingInitiated += value; }
+            remove { _crossingInitiated -= value; }
+        }
+        CrossingDelegate _crossingInitiated;
         #endregion
 
         #region cell & map printing, create grid...
@@ -165,9 +188,14 @@ namespace WFApp
                             c = Color.Yellow;
                             sVal = "C";
                         }
-                        else
+                        if (cell is Crossing)
                         {
-                            switch ((cell as Obstacle)._type)
+                            c = Color.SandyBrown;
+                            sVal = "+";
+                        }
+                        if (cell is Obstacle)
+                        {
+                            switch ((cell as Obstacle).Type)
                             {
                                 case ObstacleType.River:
                                     c = Color.Blue;
@@ -193,6 +221,10 @@ namespace WFApp
 
             gvcell.Style.BackColor = c;
             gvcell.Value = sVal;
+        }
+        public void PrintCell(Coord c, Cell cell)
+        {
+            PrintCell(cell, GetCellByCoord(c));
         }
 
         private void CreateCols(int width)
@@ -248,9 +280,9 @@ namespace WFApp
         {
             CreateGrid((int)map.Width, (int)map.Height);
 
-            for (uint x = 0; x < map.size.x; x++)
+            for (uint x = 0; x < map.Size.x; x++)
             {
-                for (uint y = 0; y < map.size.y; y++)
+                for (uint y = 0; y < map.Size.y; y++)
                 {
                     PrintCell(map[y, x], gridMap.Rows[(int)y].Cells[(int)x]);
                 }
@@ -266,9 +298,12 @@ namespace WFApp
             }
         }
 
-        public void PrintNullCell(Coord coord) // print cell with background
+        public void PrintCells(Map map, params Coord[] coord)
         {
-            PrintCell(null, GetCellByCoord(coord));
+            foreach (Coord c in coord)
+            {
+                PrintCell(map[c], GetCellByCoord(c));
+            }  
         }
 
         private DataGridViewCell GetCellByCoord(Coord c)
@@ -292,8 +327,13 @@ namespace WFApp
 
         public void OnPersonMoved(object sender, ChangePositionEventArgs args)
         {
-            PrintNullCell(args.OldCoord);
+            PrintCell(args.OldCoord, args.OldCell);
             PrintCells(args.NewCell);
+        }
+
+        public void OnCrossingCreated(object sender, CellsEventArgs args)
+        {
+            PrintCells(args._cells);
         }
         #endregion
 
@@ -319,7 +359,6 @@ namespace WFApp
             PrintMap(map);
         }
 
-
         public bool exit
         {
             get
@@ -334,7 +373,6 @@ namespace WFApp
                 }
             }
         }
-
     }
 
     class BufferedDataGridView : DataGridView

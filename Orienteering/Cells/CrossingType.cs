@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Orienteering
 {
-    public struct Point
+    [Flags]
+    public enum CrossingType
     {
-        public int x, y;
-        public Point(int y, int x)
-        {
-            this.x = x;
-            this.y = y;
-        }
+        None = 0, // 0x00000
+        Rope = 1, // 0x00001
+        Wood = 2  // 0x00010 // not used anywhere yet
     }
 }

@@ -19,6 +19,7 @@ namespace Orienteering
             
         }
         public Coord OldCoord { get; set; }
+        public Cell OldCell { get; set; }
         public Cell NewCell { get; set; }
 
         Offset _offset;
@@ -32,9 +33,10 @@ namespace Orienteering
         {
             _offset = offset;
         }
-        public ChangePositionEventArgs(Coord oldCoord, Cell newCell)
+        public ChangePositionEventArgs(Coord oldCoord, Cell oldCell, Cell newCell)
         {
             this.NewCell = newCell;
+            this.OldCell = oldCell;
             this.OldCoord = oldCoord;
         }
         public ChangePositionEventArgs(Key key)
@@ -73,7 +75,39 @@ namespace Orienteering
         }
     }
 
+    public class CrossingEventArgs : EventArgs
+    {
+        public Direction Direct { get; set; }
+        public uint MaxLen { get; set; }
+        //public Coord StartPosition { get; set; }
+        public CrossingType Type { get; set; }
+
+        public CrossingEventArgs(Key key, CrossingType type = CrossingType.Rope)
+        {
+            Type = type;
+            switch (key)
+            {
+                case Key.Down:
+                    Direct = Direction.South;
+                    break;
+                case Key.Up:
+                    Direct = Direction.North;
+                    break;
+                case Key.Left:
+                    Direct = Direction.West;
+                    break;
+                case Key.Right:
+                    Direct = Direction.East;
+                    break;
+                default:
+                    Direct = Direction.NoDirection;
+                    break;
+            }
+        }
+    }
+
     public delegate void GameControlDelegate(object sender, ref GameControlEventArgs args);
     public delegate void ChangePositionDelegate(object sender, ChangePositionEventArgs args);
     public delegate void CellsAffectedDelegate(object sender, CellsEventArgs args);
+    public delegate void CrossingDelegate(object sender, CrossingEventArgs args);
 }

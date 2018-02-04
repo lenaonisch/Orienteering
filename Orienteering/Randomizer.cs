@@ -20,7 +20,7 @@ namespace Orienteering
             return (uint)rand.Next((int)minValue, (int)maxValue);
         }
 
-        public static Direction NextDirection(Direction oldDirection)
+        public static Direction NextNotOppositeDirection(Direction oldDirection)
         {
             Direction newDirection;
             do
@@ -28,7 +28,7 @@ namespace Orienteering
                 var values = Enum.GetValues(typeof(Direction));
                 newDirection = (Direction)values.GetValue(Randomizer.Next(1, values.Length));
             }
-            while (oldDirection == newDirection);
+            while (oldDirection == newDirection || oldDirection == Coord.GetOppositeDirection(oldDirection));
             return newDirection;
         }
     }

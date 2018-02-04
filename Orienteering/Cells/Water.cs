@@ -12,23 +12,39 @@ namespace Orienteering
 
         #region ---- ctors + Clone -----
         private Water(Map owner, Coord c, bool isVisible = true, ObstacleType type = ObstacleType.River)
-            : base(owner, c, isVisible, type) { }
-        public Water(Map owner, Coord[] area, bool isVisible = true, ObstacleType type = ObstacleType.River)
-            :base(owner, area[0], isVisible, type)
+            : base(owner, c, isVisible, type) 
         {
-            cells = new Cell[area.Length];
-            cells[0] = owner[area[0]];
+            CanBeCrossedBy = CrossingType.Rope;
+        }
+        public Water(Map owner, Coord[] area, bool isVisible = true, ObstacleType type = ObstacleType.River)
+            :this(owner, area[0], isVisible, type)
+        {
+            _cells = new Cell[area.Length];
+            owner[area[0]] = this;
+            _cells[0] = this;
             for (uint i = 1; i < area.Length; i++)
             {
                 owner[area[i]] = new Water(owner, area[i], isVisible, type);
-                cells[i] = owner[area[i]];
+                _cells[i] = owner[area[i]];
+            }
+        }
+        public Water(Map owner, List<Coord> area, bool isVisible = true, ObstacleType type = ObstacleType.River)
+            : this(owner, area[0], isVisible, type)
+        {
+            _cells = new Cell[area.Count];
+            owner[area[0]] = this;
+            _cells[0] = this;
+            for (int i = 1; i < area.Count; i++)
+            {
+                owner[area[i]] = new Water(owner, area[i], isVisible, type);
+                _cells[i] = owner[area[i]];
             }
         }
 
         public Water(Water w)
             : base(w._owner, w._position, w.Visible)
         {
-
+            CanBeCrossedBy = w.CanBeCrossedBy;
         }
         public override Cell Clone()
         {
@@ -39,18 +55,18 @@ namespace Orienteering
 
         public static void CreateRandom(Map map, uint square = DEFAULT_AREA, ObstacleType type = ObstacleType.River)
         {
-            Coord[] coordinates = new Coord[square];
-            coordinates[0] = map.GetRandomEmptyCell();
+            List<Coord> coordinates = new List<Coord>((int)square);
+            coordinates.Add(map.GetRandomEmptyCell());
 
             Direction prevDirection = Direction.NoDirection;
-            uint lastfilledindex = 0;
-            while (lastfilledindex < square - 1)
+            //uint lastfilledindex = 0;
+            while (coordinates.Count < square - 1)
             {
-                Direction newDirection = Randomizer.NextDirection(prevDirection);
-                uint len = (uint)Randomizer.rand.Next(1, (int)(square - lastfilledindex - 1));
-                Coord[] ctemp = CloneCellInLine(newDirection, coordinates[lastfilledindex], len, map.size);
-                Array.Copy(ctemp, 0, coordinates, lastfilledindex+1, ctemp.Length);
-                lastfilledindex += (uint)ctemp.Length;
+                Direction newDirection = Randomizer.NextNotOppositeDirection(prevDirection);
+                uint len = (uint)Randomizer.rand.Next(1, (int)(square - coordinates.Count - 1));
+
+                List<Coord> ctemp = coordinates.Last().GetLineFromStart(newDirection, ref len, map.Size);
+                coordinates.AddRange(ctemp);
                 prevDirection = newDirection;
             }
             new Water(map, coordinates, true, type);

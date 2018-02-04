@@ -11,7 +11,7 @@ namespace Orienteering
     {
         void PrintMap(Map map);
         void PrintCells(params Cell[] cells);
-        void PrintNullCell(Coord coord); // print cell with background
+        void PrintCell(Coord coord, Cell cell); // for cases when cell can be null
         void PrintMessage(string format, params object[] args);
         void PrintError(string format, params object[] args);
         void PrintWarning(string format, params object[] args);
@@ -34,9 +34,11 @@ namespace Orienteering
         event GameControlDelegate EndGame;
         event GameControlDelegate StartGame;
         event ChangePositionDelegate MoveInitiated;
+        event CrossingDelegate CrossingCreationInitiated;
 
         void OnCheckpointTaken(object sender, CellsEventArgs args);
         void OnHiddenChkpFound(object sender, CellsEventArgs args);
         void OnPersonMoved(object sender, ChangePositionEventArgs args);
+        void OnCrossingCreated(object sender, CellsEventArgs args);
     }
 }
