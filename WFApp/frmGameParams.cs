@@ -36,7 +36,8 @@ namespace WFApp
 
         public Orienteering.MapParams GetMapParameters()
         {
-            return new Orienteering.MapParams();
+
+            return new Orienteering.MapParams(new Orienteering.Coord((uint)edtHeight.Value, (uint)edtWidth.Value));
         }
     }
 }

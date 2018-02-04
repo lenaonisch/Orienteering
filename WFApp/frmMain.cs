@@ -23,9 +23,9 @@ namespace WFApp
         #region print messages, hints etc.
         public void PrintMessage(string format, params object[] args)
         {
-            lblMessage.ForeColor = Color.Black;
-            //MessageBox.Show(String.Format(format, args), "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            lblMessage.Text = String.Format(format, args);
+            //lblMessage.ForeColor = Color.Black;
+            MessageBox.Show(String.Format(format, args), "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //lblMessage.Text = String.Format(format, args);
         }
 
         public void PrintError(string format, params object[] args)
@@ -185,8 +185,16 @@ namespace WFApp
                     {
                         if (cell is Checkpoint)
                         {
-                            c = Color.Yellow;
-                            sVal = "C";
+                            if ((cell as Checkpoint).Taken)
+                            {
+                                c = Color.DarkGoldenrod;
+                                sVal = "X";
+                            }
+                            else
+                            {
+                                c = Color.Yellow;
+                                sVal = "C";
+                            }
                         }
                         if (cell is Crossing)
                         {
@@ -227,58 +235,9 @@ namespace WFApp
             PrintCell(cell, GetCellByCoord(c));
         }
 
-        private void CreateCols(int width)
-        {
-            if (gridMap.ColumnCount < width)
-            {
-                DataGridViewColumn[] cols = new DataGridViewColumn[width];
-                for (int i = 0; i < width - gridMap.ColumnCount; i++)
-                {
-                    cols[i] = new DataGridViewTextBoxColumn();
-                    cols[i].Width = 25;
-                    cols[i].HeaderText = i.ToString();
-                }
-                gridMap.Columns.AddRange(cols);
-            }
-            else
-            {
-                for (int i = gridMap.ColumnCount; i > width; i--) //// test!!
-                {
-                    gridMap.Columns.RemoveAt(i);
-                }
-            }
-            gridMap.Width = width * 25 + gridMap.RowHeadersWidth + 15;
-        }
-        private void CreateRows(int height)
-        {
-            if (gridMap.RowCount < height)
-            {
-                string[] template = new string[] { "", "" };
-                for (int i = gridMap.RowCount; i < height; i++)
-                {
-                    gridMap.Rows.Add(template);
-                    gridMap.Rows[i].HeaderCell.Value = i.ToString();
-                }
-            }
-            else
-            {
-                for (int i = gridMap.RowCount; i > height; i--) //// test!!
-                {
-                    gridMap.Rows.RemoveAt(i);
-                }
-            }
-
-            gridMap.Height = height * gridMap.Rows[0].Height + gridMap.ColumnHeadersHeight+25;  
-        }
-        private void CreateGrid(int width, int height)
-        {
-            CreateCols(width);
-            CreateRows(height);
-        }
-
         public void PrintMap(Map map)
         {
-            CreateGrid((int)map.Width, (int)map.Height);
+            gridMap.Create((int)map.Width, (int)map.Height);
 
             for (uint x = 0; x < map.Size.x; x++)
             {
@@ -315,13 +274,16 @@ namespace WFApp
         #region event handlers
         public void OnCheckpointTaken(object sender, CellsEventArgs args)
         {
-            ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+            
+            PrintMessage("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
+            //ShowHint("Checkpoint {0} was taken!", (Checkpoint)args._cells[0]);
             PrintCells(args._cells);
         }
 
         public void OnHiddenChkpFound(object sender, CellsEventArgs args)
         {
-            PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
+            ShowHint("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
+            //PrintMessage("Nearest checkpoint is in {0} cells distance on {1} and has coord {2}!", args._len[0], args._direct[0], args._cells[0]);
             PrintCells(args._cells);
         }
 
@@ -373,6 +335,14 @@ namespace WFApp
                 }
             }
         }
+
+        private void gridMap_SelectionChanged(object sender, EventArgs e)
+        {
+            foreach (DataGridViewCell cell in gridMap.SelectedCells)
+            {
+                cell.Selected = false;
+            }
+        }
     }
 
     class BufferedDataGridView : DataGridView
@@ -381,5 +351,56 @@ namespace WFApp
         {
             DoubleBuffered = true;
         }
+
+        private void CreateCols(int width)
+        {
+            RowHeadersWidth = 50;
+            if (ColumnCount < width)
+            {
+                DataGridViewColumn[] cols = new DataGridViewColumn[width];
+                for (int i = 0; i < width - ColumnCount; i++)
+                {
+                    cols[i] = new DataGridViewTextBoxColumn();
+                    cols[i].Width = 25;
+                    cols[i].HeaderText = i.ToString();
+                }
+                Columns.AddRange(cols);
+            }
+            else
+            {
+                for (int i = ColumnCount; i > width; i--) //// test!!
+                {
+                    Columns.RemoveAt(i);
+                }
+            }
+            Width = width * 25 + RowHeadersWidth + 15;
+        }
+        private void CreateRows(int height)
+        {
+            if (RowCount < height)
+            {
+                string[] template = new string[] { "", "" };
+                for (int i = RowCount; i < height; i++)
+                {
+                    Rows.Add(template);
+                    Rows[i].HeaderCell.Value = i.ToString();
+                }
+            }
+            else
+            {
+                for (int i = RowCount; i > height; i--) //// test!!
+                {
+                    Rows.RemoveAt(i);
+                }
+            }
+
+            Height = height * Rows[0].Height + ColumnHeadersHeight + 25;
+        }
+        public void Create(int width, int height)
+        {
+            CreateCols(width);
+            CreateRows(height);
+        }
+
     }
 }

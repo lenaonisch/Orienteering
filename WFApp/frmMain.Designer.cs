@@ -129,6 +129,7 @@
             this.gridMap.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.gridMap.Size = new System.Drawing.Size(284, 189);
             this.gridMap.TabIndex = 0;
+            this.gridMap.SelectionChanged += new System.EventHandler(this.gridMap_SelectionChanged);
             this.gridMap.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             // 
             // frmMain

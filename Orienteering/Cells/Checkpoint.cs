@@ -40,7 +40,14 @@ namespace Orienteering
         public bool Taken
         {
             get { return _taken; }
-            set { _taken = value; }
+            set 
+            { 
+                _taken = value;
+                if (_taken)
+                {
+                    Visible = true;
+                }
+            }
         }
         public byte Price
         {
